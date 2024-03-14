@@ -25,3 +25,16 @@ func (s *Service) GetAllCases(lawyerID int) (cases []types.Case, err error) {
 
 	return
 }
+
+// Create a new case and assign a lawyer to it
+func (s *Service) CreateNewCase(c types.Case) (caseID int, lawyerName string, err error) {
+	log.Println("called service.CreateNewCase()")
+
+	caseID, lawyerName, err = database.CreateNewCase(c)
+	if err != nil {
+		log.Println("db err: ", err.Error())
+		return 0, "", ErrQueryFailure
+	}
+
+	return
+}

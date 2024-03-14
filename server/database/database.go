@@ -32,7 +32,7 @@ func GetAllCasesForLawyer(lawyerID int) (cases []types.Case, err error) {
 
 	var c types.Case
 
-	rows, err := conn.Query(context.Background(), GetAllCasesQ, lawyerID)
+	rows, err := conn.Query(context.Background(), GetAllUnprocessedCasesQ, lawyerID)
 	if err != nil {
 		log.Println("error with db: ", err.Error())
 		return
@@ -49,13 +49,11 @@ func GetAllCasesForLawyer(lawyerID int) (cases []types.Case, err error) {
 	return
 }
 
-func CreateNewCase(c types.Case) (err error) {
+func CreateNewCase(c types.Case) (caseID int, lawyerName string, err error) {
 	log.Println("inside database.CreateNewCase()")
 
-	var success bool
+	row := conn.QueryRow(context.Background(), CreateCaseQ, c.ClientName, c.Type, c.Description, c.Contact)
+	err = row.Scan(&caseID, &lawyerName)
 
-	row := conn.QueryRow(context.Background(), CreateCaseQ, c.ClientName, c.Type, c.Description, c.Contact, c.Interviewed, c.LawyerID)
-	err = row.Scan(&success)
-
-	return err
+	return
 }
