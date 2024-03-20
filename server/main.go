@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"net/http"
 	"server/config"
 	"server/controller"
 	"server/database"
@@ -26,6 +27,11 @@ func main() {
 
 // Sets all the endpoints for the Gin router
 func SetEndpoints(r *gin.Engine, c *controller.Controller) {
+
+	r.LoadHTMLFiles("templates/index.html")
+	r.GET("", func(ctx *gin.Context) {
+		ctx.HTML(http.StatusOK, "index.html", gin.H{})
+	})
 
 	r.GET("/cases", func(ctx *gin.Context) {
 		c.GetAllCasesForLawyer(ctx)
