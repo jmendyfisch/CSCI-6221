@@ -24,6 +24,7 @@ WORKDIR /app
 
 # Copy the pre-built binary file from the previous stage
 COPY --from=builder /app/main .
+COPY --from=builder /app/templates templates/
 
 # Expose port 8000 to the outside world
 EXPOSE 8000
