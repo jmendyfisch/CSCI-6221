@@ -1,57 +1,159 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
-  <title>AI Intake Assistant</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f2f2f2;
-      margin: 0;
-      padding: 0;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Intake Assistant</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #fafafa;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
 
-    .container {
-      max-width: 800px;
-      margin: 0 auto;
-      padding: 40px;
-      text-align: center;
-    }
+        .container {
+          width: 90%;
+          margin: 20px auto;
+          padding: 20px;
+          background-color: #fff;
+          box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+          position: relative; 
+        }
 
-    h1 {
-      font-size: 36px;
-      color: #333;
-      margin-bottom: 20px;
-    }
+        h1, h2 {
+            color: #333;
+        }
 
-    p {
-      font-size: 18px;
-      color: #666;
-      margin-bottom: 30px;
-    }
+        h3 {
+            font-style: italic; 
+            font-size: smaller; /
+            color: #555; 
+        }
 
-    .button {
-      display: inline-block;
-      padding: 12px 24px;
-      font-size: 18px;
-      font-weight: bold;
-      text-decoration: none;
-      color: #fff;
-      background-color: #007bff;
-      border-radius: 4px;
-      transition: background-color 0.3s ease;
-    }
+        p {
+            margin: 10px 0;
+            color: #666;
+        }
 
-    .button:hover {
-      background-color: #0056b3;
-    }
-  </style>
+        .button, .loginButton,
+        input[type="submit"] {
+          display: inline-block;
+          padding: 10px 20px;
+          font-size: 16px;
+          cursor: pointer;
+          text-decoration: none;
+          color: #fff;
+          background-color: #007bff;
+          border: none;
+          border-radius: 5px;
+          transition: background-color 0.3s ease;
+        }
+
+
+        .loginButton {
+          padding: 5px 10px; 
+          font-size: 14px; 
+          position: absolute;
+          top: 20px;
+          right: 20px;
+        }
+
+        .button:hover, .loginButton:hover, input[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+
+        #intakeForm, #thankYouMessage {
+            text-align: left;
+            margin-top: 20px;
+            display: none; /* Hide elements initially */
+        }
+
+        label {
+            display: block;
+            margin: 15px 0 5px;
+        }
+
+        input[type="text"], textarea {
+            width: 90%;
+            padding: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        textarea {
+            height: 100px;
+            resize: vertical;
+        }
+    </style>
 </head>
+
 <body>
-  <div class="container">
-    <h1>AI Intake Assistant</h1>
-    <p>Welcome to AI Intake Assistant, the smart solution for client intake in legal assistance visits.</p>
-    <a href="/intake-form" class="button">Start Intake</a>
-    <a href="/lawyer-login" class="button">Lawyer Login</a>
-  </div>
+    <div class="container">
+        <h1>AI Intake Assistant</h1>
+        <h3>Welcome to AI Intake Assistant, the "smart" solution for client intake in legal assistance visits.</h3>
+        <a href="/lawyer-login" class="button loginButton">Lawyer Login</a>
+        <button id="startIntakeBtn" class="button">Start Intake</button>
+
+        <form id="intakeForm" action="http://localhost:8000/create_case" method="POST">
+          <label for="client_name">Client Name:</label>
+          <input type="text" id="client_name" name="client_name">
+
+          <label for="type">Type:</label>
+          <input type="text" id="type" name="type">
+
+          <label for="description">Description:</label>
+          <textarea id="description" name="description" ></textarea>
+
+          <label for="contact">Contact:</label>
+          <input type="text" id="contact" name="contact" >
+          <br>
+          <input type="submit" value="Submit">
+        </form>
+
+        <div id="thankYouMessage">
+            <h2>Thank you for submitting!</h2>
+            <p>Your submission has been received. We will contact you soon.</p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById("startIntakeBtn").addEventListener("click", function() {
+            document.getElementById("intakeForm").style.display = "block";
+            this.style.display = "none";
+        });
+
+        document.getElementById("intakeForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            const formData = {
+                client_name: document.getElementById("client_name").value,
+                type: document.getElementById("type").value,
+                description: document.getElementById("description").value,
+                contact: document.getElementById("contact").value,
+            };
+
+            fetch(this.action, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData),
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Success:', data);
+                document.getElementById("intakeForm").style.display = "none";
+                document.getElementById("thankYouMessage").style.display = "block";
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+        });
+    </script>
 </body>
+
 </html>
