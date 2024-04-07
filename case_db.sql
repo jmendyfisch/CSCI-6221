@@ -67,7 +67,7 @@ ALTER SEQUENCE public.cases_id_seq OWNED BY public.cases.id;
 
 CREATE TABLE public.gpt_resp (
     id integer NOT NULL,
-    created timestamp without time zone NOT NULL,
+    created_at timestamp without time zone NOT NULL,
     meeting_id integer,
     questions text,
     summary text,
@@ -142,7 +142,7 @@ ALTER SEQUENCE public.lawyers_id_seq OWNED BY public.lawyers.id;
 
 CREATE TABLE public.meetings (
     id integer NOT NULL,
-    created timestamp without time zone NOT NULL,
+    created_at timestamp without time zone NOT NULL,
     case_id integer,
     lawyer_id integer,
     gpt_resp_id integer,
@@ -217,7 +217,7 @@ COPY public.cases (id, created_at, client_first_name, client_last_name, phone_nu
 -- Data for Name: gpt_resp; Type: TABLE DATA; Schema: public; Owner: swarup
 --
 
-COPY public.gpt_resp (id, created, meeting_id, questions, summary, points) FROM stdin;
+COPY public.gpt_resp (id, created_at, meeting_id, questions, summary, points) FROM stdin;
 \.
 
 
@@ -234,7 +234,7 @@ COPY public.lawyers (id, lawyer_first_name, lawyer_last_name, email_address, pas
 -- Data for Name: meetings; Type: TABLE DATA; Schema: public; Owner: swarup
 --
 
-COPY public.meetings (id, created, case_id, lawyer_id, gpt_resp_id, lawyer_notes) FROM stdin;
+COPY public.meetings (id, created_at, case_id, lawyer_id, gpt_resp_id, lawyer_notes) FROM stdin;
 \.
 
 
