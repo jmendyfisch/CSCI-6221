@@ -5,118 +5,84 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Intake Assistant</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #fafafa;
-            margin: 0;
-            padding: 0;
-            line-height: 1.6;
-        }
-
-        .container {
-          width: 90%;
-          margin: 20px auto;
-          padding: 20px;
-          background-color: #fff;
-          box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-          position: relative; 
-        }
-
-        h1, h2 {
-            color: #333;
-        }
-
-        h3 {
-            font-style: italic; 
-            font-size: smaller; 
-            color: #555; 
-        }
-
-        p {
-            margin: 10px 0;
-            color: #666;
-        }
-
-        .button, .loginButton,
-        input[type="submit"] {
-          display: inline-block;
-          padding: 10px 20px;
-          font-size: 16px;
-          cursor: pointer;
-          text-decoration: none;
-          color: #fff;
-          background-color: #007bff;
-          border: none;
-          border-radius: 5px;
-          transition: background-color 0.3s ease;
-        }
-
-
-        .loginButton {
-          padding: 5px 10px; 
-          font-size: 14px; 
-          position: absolute;
-          top: 20px;
-          right: 20px;
-        }
-
-        .button:hover, .loginButton:hover, input[type="submit"]:hover {
-            background-color: #0056b3;
-        }
-
-        #intakeForm, #thankYouMessage {
-            text-align: left;
-            margin-top: 20px;
-            display: none; /* Hide elements initially */
-        }
-
-        label {
-            display: block;
-            margin: 15px 0 5px;
-        }
-
-        input[type="text"], textarea {
-            width: 90%;
-            padding: 8px;
-            margin-bottom: 20px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-
-        textarea {
-            height: 100px;
-            resize: vertical;
-        }
-    </style>
+    <link rel="stylesheet" href="/templates/style.css">
 </head>
 
 <body>
     <div class="container">
-        <h1>AI Intake Assistant</h1>
-        <h3>Welcome to AI Intake Assistant, the "smart" solution for client intake in legal assistance visits.</h3>
+        <h1>AI-Assisted Intake</h1>
+        <h3>Welcome. This is a case tracking and intake system that utilizes AI. Please start by filling in the form below with your details. Provide as many details in this form as you can to help your lawyer conduct a better interview.</h3>
         <a href="/lawyer-login" class="button loginButton">Lawyer Login</a>
         <button id="startIntakeBtn" class="button">Start Intake</button>
 
         <form id="intakeForm" action="http://localhost:8000/create_case" method="POST">
-          <label for="client_name">Client Name:</label>
-          <input type="text" id="client_name" name="client_name">
-
-          <label for="type">Type:</label>
-          <input type="text" id="type" name="type">
-
-          <label for="description">Description:</label>
+          
+        <div class="name-fields">
+            <div class="field-group">
+                <label for="client_first_name">First Name:</label>
+                <input type="text" id="client_first_name" name="client_first_name">
+            </div>
+                
+            <div class="field-group">
+                <label for="client_last_name">Last Name:</label>
+                <input type="text" id="client_last_name" name="client_last_name">
+            </div>
+        </div>
+        <div class="case-type-group">
+            <label for="type">Case Type:
+        
+            <select id="type" name="type">
+                <option value="Please Select">--Please Select--</option>
+                <option value="Contracts">Adoption or Name Change</option>
+                <option value="Contracts">Contracts</option>
+                <option value="Consumer Law">Consumer Law</option>
+                <option value="Credit and Lending">Credit and Lending</option>
+                <option value="Criminal Law">Criminal Law</option>
+                <option value="Divorce/Family Law">Divorce/Family Law</option>
+                <option value="Employment">Employment</option>
+                <option value="Immigration">Immigration</option>
+                <option value="Landlord-Tenant">Landlord-Tenant</option>
+                <option value="Military Rights and Benefits">Miltiary Rights and Benefits</option>
+                <option value="Power of Attorney">Power of Attorney</option>
+                <option value="Real Property">Real Property</option>
+                <option value="Tax Assistance">Tax Assistance</option>
+                <option value="Voting">Voting</option>
+                <option value="Wills and Estates">Wills and Estates</option>
+                <option value="Other">Other</option>
+            </select></label>
+        </div>
+        <small>Choose the topic that best describes your issue.</small>    
+          <label for="description">Type a detailed description of your issue:</label>
           <textarea id="description" name="description" ></textarea>
 
-          <label for="contact">Contact:</label>
-          <input type="text" id="contact" name="contact" >
+
+          <div class="name-fields">
+            <div class="field-group">
+                <label for="phone_number">Phone number:</label>
+                <input type="text" id="phone_number" name="phone_number" >
+                <small>10 digits, only numbers, no dashes or spaces</small>
+            </div>
+                
+            <div class="field-group">
+                <label for="email_address">Email address:</label>
+                <input type="text" id="email_address" name="email address" >
+            </div>
+        </div>
+
+         
+
           <br>
+          <p>The information you provide will be used by your lawyer to help you with your case.
+            By submitting this form, you consent to submission of your case information to an online artificial 
+            intelligence application. The information that you provide is confidential and retains attorney-client 
+            privilege.  However, this information and the information you provide in the interview will be passed 
+            anonymously to AI software. The AI software will assist the lawyer with taking notes and asking questions.</p>
           <input type="submit" value="Submit">
         </form>
 
         <div id="thankYouMessage">
             <h2>Thank you for submitting!</h2>
-            <p>Your submission has been received. We will contact you soon.</p>
+            <p>Your submission has been received. A lawyer will review your case and contact you shortly.</p>
         </div>
     </div>
 
