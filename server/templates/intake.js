@@ -1,7 +1,9 @@
-// index.js ---------------
-// based on "how to record audio in JavaScript by Reema Alzohairi 
-// https://ralzohairi.medium.com/audio-recording-in-javascript-96eed45b75ee 
-
+/* index.js ---------------
+based on "How to record audio in JavaScript" by Reema Alzohairi 
+https://ralzohairi.medium.com/audio-recording-in-javascript-96eed45b75ee 
+With modifications to submit the audio file to the server via a POST request 
+instead of playing it back in the browser.
+*/
 //View
 var microphoneButton = document.getElementsByClassName("start-recording-button")[0];
 var recordingControlButtonsContainer = document.getElementsByClassName("recording-contorl-buttons-container")[0];
@@ -157,28 +159,23 @@ function startAudioRecording() {
             };
         });
 }
-/** Stop the currently started audio recording & sends it
- */
+/** Stop the currently started audio recording & save it */
+
 function stopAudioRecording() {
 
-    console.log("Stopping Audio Recording...");
+    console.log("Stopping Audio Recording");
 
     //stop the recording using the audio recording API
     audioRecorder.stop()
         .then(audioAsblob => {
-             // Save recorder audio
-             let formData = new FormData();
-             formData.append('audio', audioAsblob, 'recording.wav');
+            //Modified to save the audio to a file instead of playing it   
+            //playAudio(audioAsblob);
+            saveAudio(audioAsblob);
 
-            fetch('/save-audio', { 
-                method: 'POST',
-                body: formData
-            })
-            .then(response => console.log('Audio saved successfully'))
-            .catch(error => console.error('Error:', error));
-
+            console.log("Saving Audio Recording...");
             //hide recording control button & return record icon
             handleHidingRecordingControlButtons();
+           
         })
         .catch(error => {
             //Error handling structure
@@ -191,6 +188,7 @@ function stopAudioRecording() {
             };
         });
 }
+
 
 /** Cancel the currently started audio recording */
 function cancelAudioRecording() {
@@ -205,6 +203,8 @@ function cancelAudioRecording() {
 
 /** Plays recorded audio using the audio element in the HTML document
  * @param {Blob} recorderAudioAsBlob - recorded audio as a Blob Object 
+* This function was from the original code by Reema Alzohairi but is not used in this version since
+* the audio is saved to a file instead of played back in the browser.
 */
 function playAudio(recorderAudioAsBlob) {
 
@@ -223,7 +223,8 @@ function playAudio(recorderAudioAsBlob) {
 
         //set the audio element's source using the base64 URL
         audioElementSource.src = base64URL;
-
+       
+        
         //set the type of the audio element based on the recorded audio's Blob type
         let BlobType = recorderAudioAsBlob.type.includes(";") ?
             recorderAudioAsBlob.type.substr(0, recorderAudioAsBlob.type.indexOf(';')) : recorderAudioAsBlob.type;
@@ -237,12 +238,41 @@ function playAudio(recorderAudioAsBlob) {
         audioElement.play();
 
         //Display text indicator of having the audio play in the background
-        displayTextIndicatorOfAudioPlaying();
+        displayTextIndicatorOfAudioPlaying(); 
+
     };
 
     //read content and convert it to a URL (base64)
     reader.readAsDataURL(recorderAudioAsBlob);
+    
 }
+
+//New function that is implemented for this project to save the audio to a file
+function saveAudio(recorderAudioAsBlob) {
+    let BlobType = recorderAudioAsBlob.type.includes(";") ?
+    recorderAudioAsBlob.type.substr(0, recorderAudioAsBlob.type.indexOf(';')) : recorderAudioAsBlob.type;
+
+    let formData = new FormData();
+        formData.append('audio', recorderAudioAsBlob);
+        formData.append('type', BlobType);
+        formData.append('case_id', case_id);
+
+        fetch('/save-audio', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => {
+        if (response.ok) {
+            console.log('Audio saved successfully');
+            
+        } else {
+            console.error('Error saving audio:', response.statusText);
+        }
+        })
+
+    .catch(error => console.error('Error:', error));
+}
+
 
 /** Computes the elapsed recording time since the moment the function is called in the format h:m:s*/
 function handleElapsedRecordingTime() {
