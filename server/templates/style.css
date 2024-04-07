@@ -105,8 +105,8 @@ textarea {
 
 #intakeForm small {
     display: block;
-    margin-top: -8px; /* Adjusts the space between the input and the directions */
-    margin-bottom: 10px;
+    margin-top: -5px; /* Adjusts the space between the input and the directions */
+    margin-bottom: 1px;
     font-size: 0.8em; /* Smaller font size */
     color: #666; /* Dim color for less emphasis */
 }
@@ -129,6 +129,14 @@ select {
 .case-type-group label {
     margin-right: 10px; /* Adjust based on spacing preference */
 }
+
+
+.error-message {
+    color: red;
+    font-size: 0.8em; /* Adjust size as needed */
+    margin-top: -13px;
+}
+
 
 
 

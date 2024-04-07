@@ -10,22 +10,24 @@
 
 <body>
     <div class="container">
-        <h1>AI-Assisted Intake</h1>
+        <h1><img src="/templates/robot_logo.png" height="40px">AI-Assisted Intake</h1>
         <h3>Welcome. This is a case tracking and intake system that utilizes AI. Please start by filling in the form below with your details. Provide as many details in this form as you can to help your lawyer conduct a better interview.</h3>
         <a href="/lawyer-login" class="button loginButton">Lawyer Login</a>
         <button id="startIntakeBtn" class="button">Start Intake</button>
 
-        <form id="intakeForm" action="http://localhost:8000/create_case" method="POST">
+        <div id="intakeForm">
           
         <div class="name-fields">
             <div class="field-group">
                 <label for="client_first_name">First Name:</label>
                 <input type="text" id="client_first_name" name="client_first_name">
+                <span class="error-message" id="client_first_name_error"></span>
             </div>
                 
             <div class="field-group">
                 <label for="client_last_name">Last Name:</label>
                 <input type="text" id="client_last_name" name="client_last_name">
+                <span class="error-message" id="client_last_name_error"></span>
             </div>
         </div>
         <div class="case-type-group">
@@ -51,21 +53,25 @@
                 <option value="Other">Other</option>
             </select></label>
         </div>
-        <small>Choose the topic that best describes your issue.</small>    
+        <small>Choose the topic that best describes your issue.</small>
+        <span class="error-message" id="type_error"></span>    
           <label for="description">Type a detailed description of your issue:</label>
           <textarea id="description" name="description" ></textarea>
+          <span class="error-message" id="description_error" style="display:block";></span>
 
 
           <div class="name-fields">
             <div class="field-group">
                 <label for="phone_number">Phone number:</label>
-                <input type="text" id="phone_number" name="phone_number" >
+                <input type="text" id="phone_number" name="phone_number" maxlength="10">
                 <small>10 digits, only numbers, no dashes or spaces</small>
+                <span class="error-message" id="phone_number_error" style="margin-top:0px";></span>
             </div>
                 
             <div class="field-group">
                 <label for="email_address">Email address:</label>
                 <input type="text" id="email_address" name="email address" >
+                <span class="error-message" id="email_address_error"></span>
             </div>
         </div>
 
@@ -77,8 +83,8 @@
             intelligence application. The information that you provide is confidential and retains attorney-client 
             privilege.  However, this information and the information you provide in the interview will be passed 
             anonymously to AI software. The AI software will assist the lawyer with taking notes and asking questions.</p>
-          <input type="submit" value="Submit">
-        </form>
+            <button id="submit" class="button">Submit</button>
+          </div>
 
         <div id="thankYouMessage">
             <h2>Thank you for submitting!</h2>
