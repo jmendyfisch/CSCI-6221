@@ -57,7 +57,7 @@ func (c *Controller) CreateNewCase(ctx *gin.Context) {
 		return
 	}
 
-	resp.CaseID, resp.LawyerName, err = c.serv.CreateNewCase(newCase)
+	resp.CaseID, err = c.serv.CreateNewCase(newCase)
 
 	if err == service.ErrQueryFailure {
 		log.Println("db error")

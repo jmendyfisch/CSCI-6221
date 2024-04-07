@@ -1,16 +1,19 @@
 package types
 
+import "time"
+
 type Case struct {
-	ID          int    `json:"id"`
-	ClientName  string `json:"client_name" binding:"required"`
-	Type        string `json:"type" binding:"required"`
-	Description string `json:"description" binding:"required"`
-	Contact     string `json:"contact" binding:"required"`
-	Interviewed int    `json:"interviewed"`
-	LawyerID    int    `json:"lawyer_id"`
+	ID              int       `json:"id"`
+	CreatedAt       time.Time `json:"created_at"`
+	ClientFirstName string    `json:"client_first_name"`
+	ClientLastName  string    `json:"client_last_name"`
+	PhoneNumber     string    `json:"phone_number"`
+	EmailAddress    string    `json:"email_address"`
+	Type            string    `json:"type"`
+	Description     string    `json:"description"`
+	LawyerID        int       `json:"lawyer_id"`
 }
 
 type NewCaseResp struct {
 	CaseID     int    `json:"case_id"`
-	LawyerName string `json:"lawyer_name"`
 }
