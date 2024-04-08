@@ -5,6 +5,7 @@ import (
 	"log"
 	"server/config"
 	"server/types"
+	"strings"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -56,4 +57,20 @@ func CreateNewCase(c types.Case) (caseID int, err error) {
 	err = row.Scan(&c.ID)
 
 	return
+}
+
+func GetLawyerByEmail(c types.LawyerLogin) (int, string, error) {
+	log.Println("inside database.GetLawyerByEmail()")
+	emailAddress := strings.ToLower(c.EmailAddress)
+	var password string
+	var id int
+	row := conn.QueryRow(context.Background(), LawyerLoginQ, emailAddress)
+	err := row.Scan(&id, &password)
+
+	if err != nil {
+		log.Printf("Failed to get lawyer by email: %v\n", err)
+		return 0, "", err // Return 0, an empty string and the error
+	}
+
+	return id, password, nil // Return the password and nil as the error
 }

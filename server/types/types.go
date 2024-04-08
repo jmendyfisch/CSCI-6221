@@ -15,5 +15,10 @@ type Case struct {
 }
 
 type NewCaseResp struct {
-	CaseID     int    `json:"case_id"`
+	CaseID int `json:"case_id"`
+}
+
+type LawyerLogin struct {
+	EmailAddress string `json:"email_address"`
+	Password     string `json:"password"`
 }

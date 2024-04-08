@@ -61,7 +61,7 @@ input[type="submit"] {
     background-color: #0056b3;
 }
 
-#intakeForm, #thankYouMessage {
+#intakeForm, #thankYouMessage, #unknownAccountMessage {
     text-align: left;
     margin-top: 20px;
     display: none; /* Hide elements initially */

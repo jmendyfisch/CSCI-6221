@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"server/config"
 	"server/controller"
@@ -11,7 +12,10 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/gorilla/sessions"
 )
+
+var store = sessions.NewCookieStore([]byte("lawyer-login-authentication-key-1234"))
 
 func main() {
 	fmt.Println("heello")
@@ -33,7 +37,7 @@ func main() {
 // Sets all the endpoints for the Gin router
 func SetEndpoints(r *gin.Engine, c *controller.Controller) {
 
-	r.LoadHTMLFiles("templates/index.html", "templates/intake.html")
+	r.LoadHTMLFiles("templates/index.html", "templates/intake.html", "templates/lawyer-login.html", "templates/display-cases.html")
 
 	r.POST("/save-audio", func(ctx *gin.Context) {
 		file, err := ctx.FormFile("audio")
@@ -70,6 +74,34 @@ func SetEndpoints(r *gin.Engine, c *controller.Controller) {
 		ctx.HTML(http.StatusOK, "index.html", gin.H{})
 	})
 
+	r.GET("/index", func(ctx *gin.Context) {
+		ctx.HTML(http.StatusOK, "index.html", gin.H{})
+	})
+
+	r.GET("/lawyer-login", func(ctx *gin.Context) {
+		ctx.HTML(http.StatusOK, "lawyer-login.html", gin.H{})
+	})
+
+	r.GET("/display-cases", func(ctx *gin.Context) {
+		session, err := store.Get(ctx.Request, "session-name")
+		if err != nil {
+			http.Error(ctx.Writer, "Internal Server Error", http.StatusInternalServerError)
+			return
+		}
+		log.Println("session: ", session.Values["lawyer_id"])
+		
+		// Check if lawyer is logged in. THIS IS NOT CURRENTLY WORKING RIGHT
+		
+		if auth, ok := session.Values["lawyer_id"]; ok && auth != 0 {
+			// Pass the lawyer_id to the template
+			log.Println("we authorized")
+			ctx.HTML(http.StatusOK, "display-cases.html", gin.H{"lawyer_id": auth})
+		} else {
+			// Redirect to login page
+			ctx.Redirect(http.StatusSeeOther, "lawyer-login")
+		}
+	})
+
 	//intake file accepts a case_id as a parameter
 	r.GET("/intake/:case_id", func(ctx *gin.Context) {
 		caseID := ctx.Param("case_id")
@@ -88,6 +120,10 @@ func SetEndpoints(r *gin.Engine, c *controller.Controller) {
 
 	r.POST("/create_case", func(ctx *gin.Context) {
 		c.CreateNewCase(ctx)
+	})
+
+	r.POST("/lawyer_login", func(ctx *gin.Context) {
+		c.AuthenticateLawyer(ctx)
 	})
 
 }

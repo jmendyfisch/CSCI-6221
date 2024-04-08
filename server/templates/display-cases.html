@@ -1,0 +1,18 @@
+<body>
+    <div class="container">
+        <h1><img src="/templates/robot_logo.png" height="40px">AI-Assisted Intake: Lawyer Login</h1>
+        <h3 id="lawyerIdDisplay" style="display: none;">Logged in as: <span id="lawyerId"></span></h3>
+        <!-- Rest of your HTML code -->
+    </div>
+<script>
+    const lawyerId = "{{.lawyer_id}}"; // This is a placeholder for the lawyer_id passed from the server.
+    if (lawyerId) {
+        document.getElementById('lawyerId').textContent = lawyerId;
+        document.getElementById('lawyerIdDisplay').style.display = 'block';
+    } else {
+        window.location.href = '/login'; // Redirect to login page.
+    }
+</script>
+<script src="/templates/lawyer-login.js"></script>
+</body>
+</html>

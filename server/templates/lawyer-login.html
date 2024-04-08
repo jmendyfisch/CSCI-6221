@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Intake Assistant - Lawyer Login</title>
+    <link rel="stylesheet" href="/templates/style.css">
+</head>
+
+<body>
+    <div class="container">
+        <h1><img src="/templates/robot_logo.png" height="40px">AI-Assisted Intake: Lawyer Login</h1>
+        <h3>Please type your email address and password.</h3>
+        <a href="/index" class="button loginButton">Main Page</a>
+        
+        <div id="loginForm">
+            <div class="name-fields">
+                <div class="field-group">
+                    <label for="email_address">Email address:</label>
+                    <input type="text" id="email_address" name="email address" >
+                    <span class="error-message" id="email_address_error"></span>
+                </div>
+                <div class="field-group">
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" name="password">
+                    <span class="error-message" id="password_error"></span>
+                </div>
+            </div>
+            <button id="submit" class="button">Login</button> <button id="create-account" class="button">New Account</button>
+        </div>
+        
+        <div id="unknownAccountMessage">
+            <h3 style="color:red">Your login information was incorrect. Please try again.</h3>
+        </div>
+    </div>
+
+<script src="/templates/lawyer-login.js"></script>
+</body>
+
+</html>
