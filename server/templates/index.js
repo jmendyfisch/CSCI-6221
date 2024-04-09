@@ -8,6 +8,24 @@ const validStateCodes = [
 ];
 
 
+window.onload = function() {
+    // Parse cookies into an object
+    var cookies = document.cookie.split(';').reduce((cookies, item) => {
+        var [ name, value ] = item.split('=');
+        cookies[name.trim()] = value;
+        return cookies;
+    }, {});
+
+    // Check if lawyer_id cookie is set
+    if (cookies.lawyer_id) {
+        // If it is, hide the login button and show the logout and lawyer view buttons
+        document.getElementById('loginButton').style.display = 'none';
+        document.getElementById('logoutButton').style.display = 'inline-block';
+        document.getElementById('lawyerView').style.display = 'inline-block';
+    }
+}
+
+
 document.getElementById("startIntakeBtn").addEventListener("click", function() {
     document.getElementById("intakeForm").style.display = "block";
     this.style.display = "none";

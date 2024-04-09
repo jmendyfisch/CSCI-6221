@@ -55,12 +55,25 @@ input[type="submit"] {
       
 }   
 
-.loginButton {
+.loginButton, .logoutButton, .lawyerView {
   padding: 5px 10px; 
   font-size: 14px; 
   position: absolute;
   top: 20px;
-  right: 20px;
+}
+
+.loginButton {
+    right: 20px;
+  }
+
+.logoutButton {
+    right: 15px;  
+    display: none;  
+}
+
+.lawyerView{
+    right:80px;
+    display: none;
 }
 
 .button:hover, .loginButton:hover, input[type="submit"]:hover {

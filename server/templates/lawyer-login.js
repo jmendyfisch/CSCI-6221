@@ -52,14 +52,16 @@ document.getElementById("submit").addEventListener("click", function(event) {
                 timestamp = data.timestamp;
                 console.log(lawyer_id); 
                 
-                //tried putting these all in one cookie via JSON, but that wouldn't work. 
-         
+                //Three cookies to verify security. We could store these all in a JSON in one cookie, but that would 
+                //require further encoding since the JSON was breaking the cookie format. 
+                //We can't use HTTPS on localhost but in an actual implementation, we would use HTTPS. If we w
+
                 const tomorrow = new Date();
                 tomorrow.setDate(tomorrow.getDate() + 1);
                 document.cookie = "lawyer_id=" + lawyer_id + "; SameSite=Strict; expires=" + tomorrow.toUTCString();
                 document.cookie = "securitystring=" + securitystring + "; SameSite=Strict; expires=" + tomorrow.toUTCString();
                 document.cookie = "securitytimestamp=" + timestamp + "; SameSite=Strict; expires=" + tomorrow.toUTCString();
-
+    
 
                 window.location.href = "/display-cases";
             }

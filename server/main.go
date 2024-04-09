@@ -115,7 +115,10 @@ func SetEndpoints(r *gin.Engine, c *controller.Controller) {
 
 	r.GET("/display-cases", func(ctx *gin.Context) {
 
-		//login implementing custom-built security
+		//Login implementing simple custom-built security. This passes three cookies.
+		//The security string is based on the lawyerID, a secret (CookieKey), and a timestamp.
+		//Without knowing the secret word or stealing the cookies, an attacker wouldn't
+		//be able to guess the security string.
 
 		// Check if lawyerID cookie exists.
 		lawyerID, err1 := ctx.Cookie("lawyer_id")
@@ -141,6 +144,15 @@ func SetEndpoints(r *gin.Engine, c *controller.Controller) {
 			return
 		}
 
+	})
+
+	r.GET("/log-out", func(ctx *gin.Context) {
+		ctx.SetCookie("lawyer_id", "", -1, "/", "", false, true)
+		ctx.SetCookie("securitystring", "", -1, "/", "", false, true)
+		ctx.SetCookie("securitytimestamp", "", -1, "/", "", false, true)
+
+		// Redirect the user to the login page or home page after logging out
+		ctx.Redirect(http.StatusFound, "/index")
 	})
 
 	//intake file accepts a case_id as a parameter
