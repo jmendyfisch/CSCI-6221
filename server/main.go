@@ -113,24 +113,17 @@ func SetEndpoints(r *gin.Engine, c *controller.Controller) {
 
 	r.GET("/display-cases", func(ctx *gin.Context) {
 
-		//sessionInterface, exists := ctx.Get("session")
-		/*
-			if !exists {
-				http.Error(ctx.Writer, "Internal Server Error", http.StatusInternalServerError)
-				return
-			}
-		*/
-		// Check if lawyer is logged in. THIS IS NOT CURRENTLY WORKING RIGHT
-		/*
-			if auth, ok := session.Values["lawyer_id"]; ok && auth != 0 {
-				// Pass the lawyer_id to the template
-				log.Println("we authorized")
-				ctx.HTML(http.StatusOK, "display-cases.html", gin.H{"lawyer_id": auth})
-			} else {
-				// Redirect to login page
-				ctx.Redirect(http.StatusSeeOther, "lawyer-login")
-			}
-		*/
+		// Check if lawyerID cookie exists
+		lawyerID, err := ctx.Cookie("lawyer_id")
+		if err != nil {
+			// If the cookie doesn't exist, redirect to the login page
+			ctx.Redirect(http.StatusFound, "/lawyer-login")
+			return
+		}
+
+		// If the cookie exists, proceed to display cases.
+		ctx.HTML(http.StatusOK, "display-cases.html", gin.H{"lawyer_id": lawyerID})
+
 	})
 
 	//intake file accepts a case_id as a parameter

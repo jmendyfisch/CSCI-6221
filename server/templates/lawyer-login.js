@@ -49,6 +49,10 @@ document.getElementById("submit").addEventListener("click", function(event) {
                 console.log('Success:', data);
                 lawyer_id = data.lawyer_id;
                 console.log(lawyer_id); 
+                //set a cookie to store the lawyer id
+                const tomorrow = new Date();
+                tomorrow.setDate(tomorrow.getDate() + 1);
+                document.cookie = "lawyer_id=" + lawyer_id + "; SameSite=Strict; expires=" + tomorrow.toUTCString();
                 window.location.href = "/display-cases";
             }
         })
