@@ -48,11 +48,19 @@ document.getElementById("submit").addEventListener("click", function(event) {
             else {
                 console.log('Success:', data);
                 lawyer_id = data.lawyer_id;
+                securitystring = data.securitystring;
+                timestamp = data.timestamp;
                 console.log(lawyer_id); 
-                //set a cookie to store the lawyer id
+                
+                //tried putting these all in one cookie via JSON, but that wouldn't work. 
+         
                 const tomorrow = new Date();
                 tomorrow.setDate(tomorrow.getDate() + 1);
                 document.cookie = "lawyer_id=" + lawyer_id + "; SameSite=Strict; expires=" + tomorrow.toUTCString();
+                document.cookie = "securitystring=" + securitystring + "; SameSite=Strict; expires=" + tomorrow.toUTCString();
+                document.cookie = "securitytimestamp=" + timestamp + "; SameSite=Strict; expires=" + tomorrow.toUTCString();
+
+
                 window.location.href = "/display-cases";
             }
         })

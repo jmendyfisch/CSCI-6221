@@ -1,6 +1,8 @@
 package main
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
 	"net/http"
 	"server/config"
@@ -113,16 +115,31 @@ func SetEndpoints(r *gin.Engine, c *controller.Controller) {
 
 	r.GET("/display-cases", func(ctx *gin.Context) {
 
-		// Check if lawyerID cookie exists
-		lawyerID, err := ctx.Cookie("lawyer_id")
-		if err != nil {
+		//login implementing custom-built security
+
+		// Check if lawyerID cookie exists.
+		lawyerID, err1 := ctx.Cookie("lawyer_id")
+		securitystring, err2 := ctx.Cookie("securitystring")
+		timestamp, err3 := ctx.Cookie("securitytimestamp")
+
+		if err1 != nil || err2 != nil || err3 != nil {
 			// If the cookie doesn't exist, redirect to the login page
 			ctx.Redirect(http.StatusFound, "/lawyer-login")
+			fmt.Println("Missing one or more required cookies.")
 			return
 		}
 
-		// If the cookie exists, proceed to display cases.
-		ctx.HTML(http.StatusOK, "display-cases.html", gin.H{"lawyer_id": lawyerID})
+		data := config.CookieKey + timestamp + lawyerID
+		hash := sha256.Sum256([]byte(data))
+
+		if hex.EncodeToString(hash[:]) == securitystring {
+			// If everything matches, proceed to display cases.
+			ctx.HTML(http.StatusOK, "display-cases.html", gin.H{"lawyer_id": lawyerID})
+		} else {
+			ctx.Redirect(http.StatusFound, "/lawyer-login")
+			fmt.Println("Cookie security data invalid.")
+			return
+		}
 
 	})
 

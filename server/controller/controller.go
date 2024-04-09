@@ -1,11 +1,15 @@
 package controller
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"log"
 	"net/http"
+	"server/config"
 	"server/service"
 	"server/types"
 	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -118,9 +122,18 @@ func (c *Controller) AuthenticateLawyer(ctx *gin.Context) {
 		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "incorrect email or password"})
 		return
 	}
+	//Adding our own Cookie security.  This will set a hash string dependent on our CookieKey that is
+	//only known in our backend.  This would prevent someone from just spoofing
+	//a cookie containing a LawyerID integer. In implementation the whole site would be served over https.
+	timeStamp := time.Now().UnixNano()
+	timeStampStr := strconv.FormatInt(timeStamp, 10)
+
+	data := config.CookieKey + timeStampStr + strconv.Itoa(LawyerID)
+	hash := sha256.Sum256([]byte(data))
+	securityString := hex.EncodeToString(hash[:])
 
 	log.Println("success for controller.AuthenticateLawyer()")
-	ctx.JSON(http.StatusOK, gin.H{"message": "authenticated", "lawyer_id": LawyerID})
+	ctx.JSON(http.StatusOK, gin.H{"message": "authenticated", "lawyer_id": LawyerID, "timestamp": timeStampStr, "securitystring": securityString})
 
 	// I tried to do the Gorilla Cookie thing. That didn't work. I'm commenting out all the Gorilla stuff and will delete later.
 	/*
