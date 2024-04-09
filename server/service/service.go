@@ -1,6 +1,7 @@
 package service
 
 import (
+	"errors"
 	"log"
 	"server/database"
 	"server/types"
@@ -36,6 +37,26 @@ func (s *Service) CreateNewCase(c types.Case) (caseID int, err error) {
 	if err != nil {
 		log.Println("db err: ", err.Error())
 		return 0, ErrQueryFailure
+	}
+
+	return
+}
+
+func (s *Service) CreateNewLawyer(c types.Lawyer) (LawyerEmail string, err error) {
+	log.Println("called service.CreateNewLawyer()")
+
+	var ErrHashingPassword = errors.New("error hashing password")
+
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(c.Password), bcrypt.DefaultCost)
+	if err != nil {
+		log.Println("bcrypt error: ", err.Error())
+		return "", ErrHashingPassword
+	}
+
+	LawyerEmail, err = database.CreateNewLawyer(c, string(hashedPassword))
+	if err != nil {
+		log.Println("db err: ", err.Error())
+		return "", ErrQueryFailure
 	}
 
 	return

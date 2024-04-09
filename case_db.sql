@@ -33,7 +33,11 @@ CREATE TABLE public.cases (
     email_address character varying(255),
     type character varying(255),
     description text,
-    lawyer_id integer
+    lawyer_id integer,
+    address_street character varying(255),
+    address_city character varying(255),
+    address_state character(2),
+    address_zip character(5)
 );
 
 
@@ -145,7 +149,6 @@ CREATE TABLE public.meetings (
     created_at timestamp without time zone NOT NULL,
     case_id integer,
     lawyer_id integer,
-    gpt_resp_id integer,
     lawyer_notes text
 );
 
@@ -206,10 +209,12 @@ ALTER TABLE ONLY public.meetings ALTER COLUMN id SET DEFAULT nextval('public.mee
 -- Data for Name: cases; Type: TABLE DATA; Schema: public; Owner: swarup
 --
 
-COPY public.cases (id, created_at, client_first_name, client_last_name, phone_number, email_address, type, description, lawyer_id) FROM stdin;
-3	2024-04-07 17:21:08.298046	Test	Client	1234567890	a@b.c	Contracts	I have a problem with contracts	1
-4	2024-04-07 17:21:08.298046	Test2	Client2	1234567890	d@e.f	Divorce/Family Law	I have a problem with divorce	1
-5	2024-04-07 17:38:50.489463	Test4	Test4	1234567899	g@h.i	Consumer Law	I have a problem with consumer law	1
+COPY public.cases (id, created_at, client_first_name, client_last_name, phone_number, email_address, type, description, lawyer_id, address_street, address_city, address_state, address_zip) FROM stdin;
+3	2024-04-07 17:21:08.298046	Test	Client	1234567890	a@b.c	Contracts	I have a problem with contracts	1	\N	\N	\N	\N
+4	2024-04-07 17:21:08.298046	Test2	Client2	1234567890	d@e.f	Divorce/Family Law	I have a problem with divorce	1	\N	\N	\N	\N
+5	2024-04-07 17:38:50.489463	Test4	Test4	1234567899	g@h.i	Consumer Law	I have a problem with consumer law	1	\N	\N	\N	\N
+6	2024-04-09 03:31:16.949363	TestFirst5	TestLast5	6097312540	mendyman@gmail.com	Employment	I was fired from my job	1	504 West 110th St Apt 8A	New York	NY	10024
+7	2024-04-09 03:31:16.949363	TestFirst6	TestLast6	6097312540	A@b.c	Wills and Estates	I would like to create a will	1	2400 Virginia Ave NW	Washington	DC	20037
 \.
 
 
@@ -226,7 +231,15 @@ COPY public.gpt_resp (id, created_at, meeting_id, questions, summary, points) FR
 --
 
 COPY public.lawyers (id, lawyer_first_name, lawyer_last_name, email_address, password) FROM stdin;
-1	Unassigned			
+1	Unassigned			$2a$10$9M0HCdrknfgj8gbA1ZecZ.z1qqER.gCSNCOVfs7xcnDDWKyJdvs1S
+2	Mendy	Fisch	mendyman@gmail.com	$2a$10$9M0HCdrknfgj8gbA1ZecZ.z1qqER.gCSNCOVfs7xcnDDWKyJdvs1S
+3	a	b	c	d
+4			a@b.c	$2a$10$atB5kk8om3ixfSCHdPXbcOuJUiRLewZrbyV6CBFmJccqaXRuZkQxm
+7			b@c.d	$2a$10$8K0F8QVICNGYUWU4icttP.O/I1NVFjvEFYbVtExPoO66BEaquCIay
+8			d@e.f	$2a$10$rg1zUlITVxgzqM/3El1SeemQnVeBGabZhYyJD2zi4slMeXL5GYIFi
+9	Test	Lawyer2	h@i.j	$2a$10$I9eZAiZK9rTT3HwjbOVpWOeg8PUbT/CzBP4D72VsEEBU.uI5dRcny
+11	Test	Lawyer3	k@l.m	$2a$10$O8HCLITvQ4jb4qF2.QOxTuwjbE9nZ0/zgd.rdOU.1I2lACGQ0NwWe
+12	Mrimportant	Lawyer	greatemail@address.com	$2a$10$0pARFQ7gaSBYFgTLM7yJdOUALa7eW8iB2abbh82qmCaBS514THuMy
 \.
 
 
@@ -234,7 +247,7 @@ COPY public.lawyers (id, lawyer_first_name, lawyer_last_name, email_address, pas
 -- Data for Name: meetings; Type: TABLE DATA; Schema: public; Owner: swarup
 --
 
-COPY public.meetings (id, created_at, case_id, lawyer_id, gpt_resp_id, lawyer_notes) FROM stdin;
+COPY public.meetings (id, created_at, case_id, lawyer_id, lawyer_notes) FROM stdin;
 \.
 
 
@@ -242,7 +255,7 @@ COPY public.meetings (id, created_at, case_id, lawyer_id, gpt_resp_id, lawyer_no
 -- Name: cases_id_seq; Type: SEQUENCE SET; Schema: public; Owner: swarup
 --
 
-SELECT pg_catalog.setval('public.cases_id_seq', 5, true);
+SELECT pg_catalog.setval('public.cases_id_seq', 7, true);
 
 
 --
@@ -256,7 +269,7 @@ SELECT pg_catalog.setval('public.gpt_resp_id_seq', 1, false);
 -- Name: lawyers_id_seq; Type: SEQUENCE SET; Schema: public; Owner: swarup
 --
 
-SELECT pg_catalog.setval('public.lawyers_id_seq', 1, false);
+SELECT pg_catalog.setval('public.lawyers_id_seq', 12, true);
 
 
 --

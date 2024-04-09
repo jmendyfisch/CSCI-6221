@@ -53,8 +53,19 @@ func GetAllCasesForLawyer(lawyerID int) (cases []types.Case, err error) {
 func CreateNewCase(c types.Case) (caseID int, err error) {
 	log.Println("inside database.CreateNewCase()")
 
-	row := conn.QueryRow(context.Background(), CreateCaseQ, c.ClientFirstName, c.ClientLastName, c.Type, c.Description, c.PhoneNumber, c.EmailAddress)
+	row := conn.QueryRow(context.Background(), CreateCaseQ, c.ClientFirstName, c.ClientLastName, c.Type, c.Description, c.PhoneNumber, c.EmailAddress, c.AddressStreet, c.AddressCity, c.AddressState, c.AddressZip)
 	err = row.Scan(&c.ID)
+
+	return
+}
+
+func CreateNewLawyer(c types.Lawyer, hashedPassword string) (LawyerEmail string, err error) {
+	log.Println("inside database.CreateNewLawyer()")
+	var email = strings.ToLower(c.EmailAddress)
+
+	log.Println(c.LawyerFirstName)
+	row := conn.QueryRow(context.Background(), CreateLawyerQ, c.LawyerFirstName, c.LawyerLastName, email, hashedPassword)
+	err = row.Scan(&email)
 
 	return
 }

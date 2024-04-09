@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Intake Assistant - New Accoumt</title>
+    <link rel="stylesheet" href="/templates/style.css">
+</head>
+
+<body>
+    <div class="container">
+        <h1><img src="/templates/robot_logo.png" height="40px">AI-Assisted Intake: New Account</h1>
+        <h3>Lawyers: Please input your information to create an account.</h3>
+        <a href="/index" class="button loginButton">Main Page</a>
+        
+        <div id="loginForm">
+
+            <div class="name-fields">
+                <div class="field-group">
+                    <label for="lawyer_first_name">First Name:</label>
+                    <input type="text" id="lawyer_first_name" name="lawyer_first_name">
+                    <span class="error-message" id="lawyer_first_name_error"></span>
+                </div>
+                    
+                <div class="field-group">
+                    <label for="lawyer_last_name">Last Name:</label>
+                    <input type="text" id="lawyer_last_name" name="lawyer_last_name">
+                    <span class="error-message" id="lawyer_last_name_error"></span>
+                </div>
+            </div>
+
+            <div class="name-fields">
+                <div class="field-group">
+                    <label for="email_address">Email address:</label>
+                    <input type="text" id="email_address" name="email address" >
+                    <span class="error-message" id="email_address_error"></span>
+                </div>
+                <div class="field-group">
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" name="password">
+                    <span class="error-message" id="password_error"></span>
+                </div>
+                <div class="field-group">
+                    <label for="password2">Retype Password:</label>
+                    <input type="password" id="password2" name="password2">
+                    
+                </div>
+            </div>
+            <button id="submit" class="button">Create Account</button> 
+        
+        </div>
+        
+    <div id="existingAccountMessage">
+        <h3 style="color:red">An account already exists for that email address.</h3>
+    </div>
+    <div id="pleaseLogin">
+        <h3 style="color:green">Account successfully created.</h3>
+            <a class="button" href="lawyer-login">Lawyer Login</a> 
+    </div>
+
+    
+
+<script src="/templates/new-account.js"></script>
+</body>
+
+</html>

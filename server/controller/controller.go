@@ -8,7 +8,6 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"github.com/gorilla/sessions"
 )
 
 /*
@@ -70,6 +69,32 @@ func (c *Controller) CreateNewCase(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, resp)
 }
 
+func (c *Controller) CreateNewLawyer(ctx *gin.Context) {
+	log.Println("inside controller.CreateNewLawyer()")
+	var newLawyer types.Lawyer
+	var resp types.NewLawyerResp
+	var err error
+
+	if err = ctx.BindJSON(&newLawyer); err != nil {
+		log.Println("incorrect lawyer format")
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "incorrect lawyer format"})
+		return
+	}
+
+	log.Println("newLawyer: ", newLawyer)
+
+	resp.LawyerEmail, err = c.serv.CreateNewLawyer(newLawyer)
+
+	if err == service.ErrQueryFailure {
+		log.Println("db error")
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	log.Println("success for controller.CreateNewLawyer()")
+	ctx.JSON(http.StatusOK, resp)
+}
+
 func (c *Controller) AuthenticateLawyer(ctx *gin.Context) {
 	var lawyer types.LawyerLogin
 	var err error
@@ -97,56 +122,36 @@ func (c *Controller) AuthenticateLawyer(ctx *gin.Context) {
 	log.Println("success for controller.AuthenticateLawyer()")
 	ctx.JSON(http.StatusOK, gin.H{"message": "authenticated", "lawyer_id": LawyerID})
 
-	// Start a session
-	c.StartLawyerSession(LawyerID, ctx.Writer, ctx.Request)
-}
+	// I tried to do the Gorilla Cookie thing. That didn't work. I'm commenting out all the Gorilla stuff and will delete later.
+	/*
+		request := ctx.Request
+		session, err := c.store.Get(ctx.Request, "session-name")
+		if err != nil {
+			log.Println("Error retrieving session:", err)
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+		ctx.Set("session", session)
+		ctx.Set("lawyer_id", LawyerID)
 
-var (
-	key   = []byte("lawyer-login-authentication-key-1234")
-	store = sessions.NewCookieStore(key)
-)
+		// Set lawyer ID in session
+		session.Values["lawyer_id"] = LawyerID
 
-// StartLawyerSession starts a session for a lawyer
+		session.Options = &sessions.Options{
+			Path:     "/",   // Available throughout the site
+			MaxAge:   86400, // Expires after 1 day
+			HttpOnly: false, // Make accessible via JavaScript
+			Secure:   false, // When running in localhost, we are not over HTTPS
+			SameSite: http.SameSiteLaxMode,
+		}
 
-func (c *Controller) StartLawyerSession(lawyerID int, response http.ResponseWriter, request *http.Request) {
-	session, err := store.Get(request, "session-name")
-	if err != nil {
-		log.Println("Error retrieving session:", err)
-		http.Error(response, "Internal Server Error", http.StatusInternalServerError)
-		return
-	}
+		// Save the session
+		err = session.Save(request, ctx.Writer)
+		if err != nil {
+			log.Println("Error saving session:", err)
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+	*/
 
-	// Set lawyer ID in session
-	session.Values["lawyer_id"] = lawyerID
-	log.Println("lawyer_id in session:", lawyerID)
-	session.Options = &sessions.Options{
-		Path:     "/",   // Available throughout the site
-		MaxAge:   86400, // Expires after 1 day
-		HttpOnly: false, // Make accessible via JavaScript
-		Secure:   false, // When running in localhost, we are not over HTTPS
-	}
-
-	// Save the session
-	err = session.Save(request, response)
-	if err != nil {
-		log.Println("Error saving session:", err)
-		http.Error(response, "Internal Server Error", http.StatusInternalServerError)
-		return
-	}
-
-	//session_test, _ := store.Get(request, "session-name")
-	//lawyer_id_test := session_test.Values["lawyer_id"]
-	//log.Println("lawyer_id in session test:", lawyer_id_test)
-}
-
-func (c *Controller) ReturnLawyerSession(request *http.Request) (int, error) {
-	session, err := store.Get(request, "session-name")
-	if err != nil {
-		log.Println("Error retrieving session:", err)
-		return 0, err
-	}
-
-	lawyer_id := session.Values["lawyer_id"]
-	log.Println("lawyer_id in session:", lawyer_id)
-	return lawyer_id.(int), nil
 }

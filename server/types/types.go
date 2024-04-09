@@ -12,6 +12,10 @@ type Case struct {
 	Type            string    `json:"type"`
 	Description     string    `json:"description"`
 	LawyerID        int       `json:"lawyer_id"`
+	AddressStreet   string    `json:"address_street"`
+	AddressCity     string    `json:"address_city"`
+	AddressState    string    `json:"address_state"`
+	AddressZip      string    `json:"address_zip"`
 }
 
 type NewCaseResp struct {
@@ -21,4 +25,15 @@ type NewCaseResp struct {
 type LawyerLogin struct {
 	EmailAddress string `json:"email_address"`
 	Password     string `json:"password"`
+}
+
+type Lawyer struct {
+	LawyerFirstName string `json:"lawyer_first_name"`
+	LawyerLastName  string `json:"lawyer_last_name"`
+	EmailAddress    string `json:"email_address"`
+	Password        string `json:"password"`
+}
+
+type NewLawyerResp struct {
+	LawyerEmail string `json:"email_address"`
 }

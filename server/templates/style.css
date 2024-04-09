@@ -1,6 +1,7 @@
 
 
-/* Styles for main page */ 
+/* Styles for all pages.  Original file written for project, with ChatGPT assistance
+to tweak layout. */ 
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -34,7 +35,7 @@ p {
     color: #666;
 }
 
-.button, .loginButton,
+.button, .loginButton, .createAccountLoginButton,
 input[type="submit"] {
   display: inline-block;
   padding: 10px 20px;
@@ -49,6 +50,11 @@ input[type="submit"] {
 }
 
 
+.createAccountLoginButton {
+  padding: 5px 10px; 
+      
+}   
+
 .loginButton {
   padding: 5px 10px; 
   font-size: 14px; 
@@ -61,7 +67,7 @@ input[type="submit"] {
     background-color: #0056b3;
 }
 
-#intakeForm, #thankYouMessage, #unknownAccountMessage {
+#intakeForm, #thankYouMessage, #unknownAccountMessage, #pleaseLogin, #existingAccountMessage{
     text-align: left;
     margin-top: 20px;
     display: none; /* Hide elements initially */
@@ -75,7 +81,7 @@ label {
 input[type="text"], textarea, input[type="password"] {
     width: 95%;
     padding: 8px;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
     border: 1px solid #ccc;
     border-radius: 4px;
     box-sizing: border-box;
@@ -116,7 +122,7 @@ select {
     font-family: inherit; /* Ensures dropdown uses the same font as the form */
     font-size: 16px; /* Adjust as needed to match other input fields */
     padding: 2px 2px; /* Provides padding inside the dropdown */
-    margin-right: 20px; /* Optional: adds space to the right of the select, if needed */
+    margin-right: 20px; 
     width: auto; /* Adjusts width automatically based on content */
 }
 
@@ -127,16 +133,15 @@ select {
 }
 
 .case-type-group label {
-    margin-right: 10px; /* Adjust based on spacing preference */
+    margin-right: 10px; 
 }
 
 
 .error-message {
     color: red;
-    font-size: 0.8em; /* Adjust size as needed */
+    font-size: 0.8em; 
     margin-top: -13px;
 }
-
 
 
 
@@ -146,3 +151,57 @@ select {
     }
 }
 
+.address-fields {
+    display: flex;
+    justify-content: start;  
+    align-items: left;
+    gap: 20px; 
+    width: 95%;
+   
+}
+
+.address-fields .field-group {
+    margin-bottom: 10px; 
+    min-width: 0; 
+}
+
+.address-fields .field-group input[type="text"] {
+    width: 100%; 
+}
+
+.field-group.state, .field-group.zip {
+    flex-basis: auto; 
+    max-width: 80px; 
+}
+
+
+#state {
+    max-width: 70px; 
+    flex-grow: 0; 
+}
+
+#zip {
+    max-width: 80px; 
+    flex-grow: 0; 
+}
+
+.field-group.city {
+    flex-grow: 3; /* Takes remaining space after other fields are sized */
+    flex-basis: 40%;
+}
+
+
+.field-group.street {
+    flex-grow: 4; /* Largest field, allowed to take most space */
+    flex-basis: 90%;
+}
+
+@media (max-width: 600px) {
+    .address-fields {
+        flex-direction: column; /* Stack fields vertically on small screens */
+    }
+
+    .address-fields .field-group {
+        width: auto; 
+    }
+}

@@ -60,7 +60,34 @@
           <span class="error-message" id="description_error" style="display:block";></span>
 
 
-          <div class="name-fields">
+          <div class="address-fields">
+            <div class="field-group street">
+                <label for="street_address">Street Address:</label>
+                <input type="text" id="street_address" name="street_address">
+                <span class="error-message" id="street_address_error"></span>
+            </div>
+            <div class="field-group city">
+                <label for="city">City:</label>
+                <input type="text" id="city" name="city">
+                <span class="error-message" id="city_error"></span>
+            </div>
+            <div class="field-group state">
+                <label for="state">State:</label>
+                <input type="text" id="state" name="state" maxlength="2">
+                <small>2 letters</small>
+                <span class="error-message" id="state_error" style="margin-top:0px";></span>
+            </div>
+            <div class="field-group zip">
+                <label for="zip">Zip:</label>
+                <input type="text" id="zip" name="zip" maxlength="5">
+                <small>5 digits</small>
+                <span class="error-message" id="zip_error" style="margin-top:0px";></span>
+            </div>
+        </div>
+        
+
+
+        <div class="name-fields">
             <div class="field-group">
                 <label for="phone_number">Phone number:</label>
                 <input type="text" id="phone_number" name="phone_number" maxlength="10">

@@ -1,3 +1,13 @@
+const validStateCodes = [
+    'AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'FL', 'GA', 
+    'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MD', 
+    'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ', 
+    'NM', 'NY', 'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC', 
+    'SD', 'TN', 'TX', 'UT', 'VT', 'VA', 'WA', 'WV', 'WI', 'WY',
+    'AS', 'DC', 'FM', 'GU', 'MH', 'MP', 'PW', 'PR', 'VI'
+];
+
+
 document.getElementById("startIntakeBtn").addEventListener("click", function() {
     document.getElementById("intakeForm").style.display = "block";
     this.style.display = "none";
@@ -41,7 +51,7 @@ document.getElementById("submit").addEventListener("click", function(event) {
         isValid = false;
     }
 
-
+    //phone number validation
     const phoneNumber = document.getElementById("phone_number");
     const phoneNumberRegex = /^\d{10}$/;
     if (!phoneNumberRegex.test(phoneNumber.value)) {
@@ -56,7 +66,35 @@ document.getElementById("submit").addEventListener("click", function(event) {
         isValid = false;
     }
 
-    //alert("Form is valid: " + isValid);
+    // Street Address Validation
+    const streetAddress = document.getElementById("street_address");
+    if (!streetAddress.value.trim()) {
+        displayError(streetAddress, "Street Address is required");
+        isValid = false;
+    }
+
+    // City Validation
+    const city = document.getElementById("city");
+    if (!city.value.trim()) {
+        displayError(city, "City is required");
+        isValid = false;
+    }
+
+    // State Validation
+    const state = document.getElementById("state");
+    if (!state.value.trim() || state.value.trim().length !== 2 || !validStateCodes.includes(state.value.trim().toUpperCase())) {
+        displayError(state, "Invalid state");
+        isValid = false;
+    }
+
+    // Zip Validation
+    const zip = document.getElementById("zip");
+    const zipRegex = /^\d{5}$/;
+    if (!zipRegex.test(zip.value)) {
+        displayError(zip, "Invalid zip");
+        isValid = false;
+    }
+
 
     if (!isValid) {
         event.preventDefault();
@@ -71,7 +109,11 @@ document.getElementById("submit").addEventListener("click", function(event) {
             type: document.getElementById("type").value,
             description: document.getElementById("description").value,
             phone_number: document.getElementById("phone_number").value,
-            email_address: document.getElementById("email_address").value
+            email_address: document.getElementById("email_address").value,
+            address_street: document.getElementById("street_address").value,
+            address_city: document.getElementById("city").value,
+            address_state: document.getElementById("state").value,
+            address_zip: document.getElementById("zip").value
         };
 
         fetch('/create_case', {

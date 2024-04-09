@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"server/config"
 	"server/controller"
@@ -12,12 +11,10 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/gorilla/sessions"
 )
 
-var store = sessions.NewCookieStore([]byte("lawyer-login-authentication-key-1234"))
-
 func main() {
+
 	fmt.Println("heello")
 	database.Init()
 
@@ -34,10 +31,38 @@ func main() {
 
 }
 
+// gorilla session middleware
+/*  This was me trying to implement gorilla sessions. I couldn't get it to work.
+func GorillaSessionMiddleware(store *sessions.CookieStore) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// Load session
+		session, err := store.Get(c.Request, "session-name")
+		if err != nil {
+			log.Printf("Error loading session: %v", err)
+			c.AbortWithStatus(http.StatusInternalServerError)
+			return
+		}
+
+		// Make the session available in the context
+		c.Set("session", session)
+
+		c.Next()
+
+		// Save the session
+		err = sessions.Save(c.Request, c.Writer)
+		if err != nil {
+			log.Printf("Error saving session: %v", err)
+			c.AbortWithStatus(http.StatusInternalServerError)
+			return
+		}
+	}
+}
+*/
+
 // Sets all the endpoints for the Gin router
 func SetEndpoints(r *gin.Engine, c *controller.Controller) {
 
-	r.LoadHTMLFiles("templates/index.html", "templates/intake.html", "templates/lawyer-login.html", "templates/display-cases.html")
+	r.LoadHTMLFiles("templates/index.html", "templates/intake.html", "templates/lawyer-login.html", "templates/display-cases.html", "templates/new-account.html")
 
 	r.POST("/save-audio", func(ctx *gin.Context) {
 		file, err := ctx.FormFile("audio")
@@ -82,24 +107,30 @@ func SetEndpoints(r *gin.Engine, c *controller.Controller) {
 		ctx.HTML(http.StatusOK, "lawyer-login.html", gin.H{})
 	})
 
+	r.GET("/new-account", func(ctx *gin.Context) {
+		ctx.HTML(http.StatusOK, "new-account.html", gin.H{})
+	})
+
 	r.GET("/display-cases", func(ctx *gin.Context) {
-		session, err := store.Get(ctx.Request, "session-name")
-		if err != nil {
-			http.Error(ctx.Writer, "Internal Server Error", http.StatusInternalServerError)
-			return
-		}
-		log.Println("session: ", session.Values["lawyer_id"])
-		
+
+		//sessionInterface, exists := ctx.Get("session")
+		/*
+			if !exists {
+				http.Error(ctx.Writer, "Internal Server Error", http.StatusInternalServerError)
+				return
+			}
+		*/
 		// Check if lawyer is logged in. THIS IS NOT CURRENTLY WORKING RIGHT
-		
-		if auth, ok := session.Values["lawyer_id"]; ok && auth != 0 {
-			// Pass the lawyer_id to the template
-			log.Println("we authorized")
-			ctx.HTML(http.StatusOK, "display-cases.html", gin.H{"lawyer_id": auth})
-		} else {
-			// Redirect to login page
-			ctx.Redirect(http.StatusSeeOther, "lawyer-login")
-		}
+		/*
+			if auth, ok := session.Values["lawyer_id"]; ok && auth != 0 {
+				// Pass the lawyer_id to the template
+				log.Println("we authorized")
+				ctx.HTML(http.StatusOK, "display-cases.html", gin.H{"lawyer_id": auth})
+			} else {
+				// Redirect to login page
+				ctx.Redirect(http.StatusSeeOther, "lawyer-login")
+			}
+		*/
 	})
 
 	//intake file accepts a case_id as a parameter
@@ -124,6 +155,10 @@ func SetEndpoints(r *gin.Engine, c *controller.Controller) {
 
 	r.POST("/lawyer_login", func(ctx *gin.Context) {
 		c.AuthenticateLawyer(ctx)
+	})
+
+	r.POST("/create_lawyer_account", func(ctx *gin.Context) {
+		c.CreateNewLawyer(ctx)
 	})
 
 }
