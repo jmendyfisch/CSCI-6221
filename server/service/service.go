@@ -2,7 +2,6 @@ package service
 
 import (
 	"errors"
-	"fmt"
 	"log"
 	"server/database"
 	"server/types"
@@ -67,30 +66,32 @@ func (s *Service) AuthenticateLawyer(c types.LawyerLogin) (Success bool, LawyerI
 
 	log.Println("called service.AuthenticateLawyer()")
 
-	id, password, error := database.GetLawyerByEmail(c)
-	if error != nil {
-		log.Println("db err: ", error.Error())
+	id, password, err := database.GetLawyerByEmail(c)
+	if err != nil {
+		log.Println("db err: ", err.Error())
 		return false, id, err
 	}
 
-	fmt.Println("password hashes: ", password, c.Password)
+	log.Println("passwords: ", password, c.Password)
+
+	return password == c.Password, id, nil
 
 	// Code used to debug if passwords aren't matching
 
-	var ErrHashingPassword = errors.New("error hashing password")
+	// var ErrHashingPassword = errors.New("error hashing password")
 
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(c.Password), bcrypt.DefaultCost)
-	if err != nil {
-		log.Println("bcrypt error: ", err.Error())
-		return false, 0, ErrHashingPassword
-	}
+	// hashedPassword, err := bcrypt.GenerateFromPassword([]byte(c.Password), bcrypt.DefaultCost)
+	// if err != nil {
+	// 	log.Println("bcrypt error: ", err.Error())
+	// 	return false, 0, ErrHashingPassword
+	// }
 
-	log.Println(string(hashedPassword))
-	log.Println("in db:" + password)
+	// log.Println(string(hashedPassword))
+	// log.Println("in db:" + password)
 
 	// Compare the hashed password with the stored password
-	err = bcrypt.CompareHashAndPassword([]byte(password), []byte(c.Password))
-	return err != nil, id, nil // Password does not match
+	// err = bcrypt.CompareHashAndPassword([]byte(password), []byte(c.Password))
+	// return err != nil, id, nil // Password does not match
 }
 
 func (s *Service) ProcessInterview(caseID int, interviewAudio []byte, filepath string) (gptRes types.GPTPromptOutput, err error) {
@@ -101,7 +102,7 @@ func (s *Service) ProcessInterview(caseID int, interviewAudio []byte, filepath s
 		return
 	}
 
-	fmt.Println("interview text: ", interviewText)
+	log.Println("interview text: ", interviewText)
 
 	// step 2 - send text, ask to split it into lawyer and client, get summary and addtl questions to ask client.
 	gptRes, err = getOutputTextFromTranscription(interviewText)

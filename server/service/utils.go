@@ -3,7 +3,6 @@ package service
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"log"
 	"server/config"
 	"server/types"
@@ -50,7 +49,7 @@ func getOutputTextFromTranscription(text string) (res types.GPTPromptOutput, err
 
 	jsonText := resp.Choices[0].Message.Content
 
-	fmt.Println("json resp from gpt: \n", jsonText)
+	log.Println("json resp from gpt: \n", jsonText)
 
 	err = json.Unmarshal([]byte(jsonText), &res)
 	if err != nil {
