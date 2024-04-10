@@ -30,6 +30,12 @@ h3 {
     color: #555; 
 }
 
+h4 {
+    font-size: 18px;
+    text-align: Center;
+    padding-bottom: none;
+}
+
 p {
     margin: 10px 0;
     color: #666;
@@ -217,4 +223,57 @@ select {
     .address-fields .field-group {
         width: auto; 
     }
+}
+
+/*table styles for the display-cases page*/
+
+table {
+    width: 95%;
+    margin: 0 auto; /* Center the table */
+    border-collapse: collapse; /* Remove space between borders */
+}
+
+th, td {
+    text-align: left;
+    padding: 8px; /* Adjust padding as needed */
+}
+
+th {
+    cursor: pointer; /* Indicates that the header is clickable for sorting */
+    background-color: #000;
+    color: white;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+th:hover{
+   color: #007bff
+}
+
+tr:nth-child(even) {
+    background-color: #f2f2f2; /* Light shade of gray for even rows */
+}
+
+tr:nth-child(odd) {
+    background-color: #d9d9d9; /* Medium shade of gray for odd rows */
+}
+
+a.table-link {
+    color: black; /* Initial color for links in table */
+    text-decoration: none; /* Removes underline from links */
+}
+
+/*
+a.table-link:hover {
+    color: darkblue; /
+    font-weight: bold;
+}*/
+
+.hovered-row td {
+    color: #007bff;
+    font-weight: bold;
+}
+
+.hovered-row .table-link {
+    color: inherit; /* This makes the link use the current text color, which we set to dark blue on row hover */
+    font-weight: inherit; /* Same for font weight */
 }

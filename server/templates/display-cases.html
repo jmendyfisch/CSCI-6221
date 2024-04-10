@@ -1,18 +1,68 @@
-<body>
-    <div class="container">
-        <h1><img src="/templates/robot_logo.png" height="40px">AI-Assisted Intake: Lawyer Login</h1>
-        <h3 id="lawyerIdDisplay" style="display: none;">Logged in as: <span id="lawyerId"></span></h3>
-        <!-- Rest of your HTML code -->
-    </div>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Intake Assistant - View Cases</title>
+    <link rel="stylesheet" href="/templates/style.css">
+</head>
 <script>
-    const lawyerId = "{{.lawyer_id}}"; // This is a placeholder for the lawyer_id passed from the server.
-    if (lawyerId) {
-        document.getElementById('lawyerId').textContent = lawyerId;
-        document.getElementById('lawyerIdDisplay').style.display = 'block';
-    } else {
+    const lawyerId = "{{.lawyer_id}}"; // Check to make sure lawyerID passed from the server before loading rest of page.
+    if (!lawyerId) {
         window.location.href = '/lawyer-login'; // Redirect to login page.
     }
 </script>
-<script src="/templates/lawyer-login.js"></script>
+
+<body>
+    <div class="container">
+        <h1><img src="/templates/robot_logo.png" height="40px">AI-Assisted Intake: View Cases</h1>
+        <h3>View your cases or assign new cases to yourself.</h3>
+        <a href="/index" class="button lawyerView" id="lawyerView" style="display:inline-block">Main Page</a>
+        <a href="/log-out" class="button logoutButton" id="logoutButton" style="display:inline-block">Logout</a>
+        <div id="loginForm">
+
+            <div id="assignedCases">
+                <h4>Assigned Cases</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Last Name</th>
+                            <th>First Name</th>
+                            <th>Type of Case</th>
+                            <th>Date Initiated</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="assignedCasesBody">
+                        <!-- Assigned cases will be populated here -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <div id="unassignedCases">
+                <h4>Unassigned Cases</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Last Name</th>
+                            <th>First Name</th>
+                            <th>Type of Case</th>
+                            <th>Date Initiated</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="unassignedCasesBody">
+                        <!-- Unassigned cases will be populated here -->
+                    </tbody>
+                </table>
+            </div>
+            
+        </div>
+
+    
+    </div>
+    <script src="/templates/display-cases.js"></script>
 </body>
+
 </html>
