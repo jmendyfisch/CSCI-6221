@@ -117,9 +117,10 @@ func AddNewMeetingDetails(caseID int, gptResp types.GPTPromptOutput) (err error)
 	err = row.Scan(&meetingID)
 	if err != nil {
 		log.Println("db error: ", err)
+		return ErrMeetingInsert
 	}
 
-	return ErrMeetingInsert
+	return nil
 }
 
 func AddNotesToMeeting(meetingID int, notes string) error {
