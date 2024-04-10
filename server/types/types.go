@@ -37,3 +37,15 @@ type Lawyer struct {
 type NewLawyerResp struct {
 	LawyerEmail string `json:"email_address"`
 }
+
+type GPTPromptOutput struct {
+	MeetingID        int      `json:"meeting_id"`
+	Questions        []string `json:"questions" binding:"required"`
+	Summary          string   `json:"summary" binding:"required"`
+	AdditionalPoints []string `json:"points" binding:"required"`
+}
+
+type Notes struct {
+	MeetingID int    `json:"meeting_id"`
+	Notes     string `json:"notes"`
+}

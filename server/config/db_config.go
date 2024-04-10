@@ -4,6 +4,6 @@ const (
 	DBUser     = `swarup`
 	DBPassword = `wordpass`
 	DBName     = `case_db`
-	DBHost     = `host.docker.internal`
+	DBHost     = `localhost`
 	DBPort     = `5432`
 )

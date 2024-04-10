@@ -1,14 +1,19 @@
 package controller
 
 import (
+	"bytes"
 	"crypto/sha256"
 	"encoding/hex"
+	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"server/config"
+	"server/database"
 	"server/service"
 	"server/types"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -137,34 +142,125 @@ func (c *Controller) AuthenticateLawyer(ctx *gin.Context) {
 
 	// I tried to do the Gorilla Cookie thing. That didn't work. I'm commenting out all the Gorilla stuff and will delete later.
 	/*
-		request := ctx.Request
-		session, err := c.store.Get(ctx.Request, "session-name")
-		if err != nil {
-			log.Println("Error retrieving session:", err)
-			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-			return
-		}
-		ctx.Set("session", session)
-		ctx.Set("lawyer_id", LawyerID)
+			request := ctx.Request
+			session, err := c.store.Get(ctx.Request, "session-name")
+			if err != nil {
+				log.Println("Error retrieving session:", err)
+				ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+				return
+			}
+			ctx.Set("session", session)
+			ctx.Set("lawyer_id", LawyerID)
 
-		// Set lawyer ID in session
-		session.Values["lawyer_id"] = LawyerID
+			// Set lawyer ID in session
+			session.Values["lawyer_id"] = LawyerID
 
-		session.Options = &sessions.Options{
-			Path:     "/",   // Available throughout the site
-			MaxAge:   86400, // Expires after 1 day
-			HttpOnly: false, // Make accessible via JavaScript
-			Secure:   false, // When running in localhost, we are not over HTTPS
-			SameSite: http.SameSiteLaxMode,
-		}
+			session.Options = &sessions.Options{
+				Path:     "/",   // Available throughout the site
+				MaxAge:   86400, // Expires after 1 day
+				HttpOnly: false, // Make accessible via JavaScript
+				Secure:   false, // When running in localhost, we are not over HTTPS
+				SameSite: http.SameSiteLaxMode,
+			}
 
 		// Save the session
-		err = session.Save(request, ctx.Writer)
+		err = session.Save(request, response)
 		if err != nil {
 			log.Println("Error saving session:", err)
-			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			http.Error(response, "Internal Server Error", http.StatusInternalServerError)
 			return
 		}
-	*/
 
+		//session_test, _ := store.Get(request, "session-name")
+		//lawyer_id_test := session_test.Values["lawyer_id"]
+		//log.Println("lawyer_id in session test:", lawyer_id_test)
+	*/
+}
+
+// func (c *Controller) ReturnLawyerSession(request *http.Request) (int, error) {
+// 	session, err := store.Get(request, "session-name")
+// 	if err != nil {
+// 		log.Println("Error retrieving session:", err)
+// 		return 0, err
+// 	}
+
+// 	lawyer_id := session.Values["lawyer_id"]
+// 	log.Println("lawyer_id in session:", lawyer_id)
+// 	return lawyer_id.(int), nil
+// }
+
+func (c *Controller) ProcessInterview(ctx *gin.Context) {
+	// get audio file
+	file, err := ctx.FormFile("audio")
+	if err != nil {
+		log.Println("could not find file in request")
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	audioType := ctx.PostForm("type")
+	if audioType == "" {
+		log.Println("no audio type provided")
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "No audio type provided"})
+		return
+	}
+
+	audioType = strings.TrimPrefix(audioType, "audio/")
+
+	if audioType != config.AudioFileExtension {
+		log.Println("incorrect audio type provided")
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Incorrect audio type provided"})
+		return
+	}
+
+	case_id := ctx.PostForm("case_id")
+	if case_id == "" {
+		log.Println("No case id provided")
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "No case id provided"})
+		return
+	}
+
+	filename := fmt.Sprintf("rec_case_%s_%v.%s", case_id, time.Now().UnixNano(), audioType)
+	path := fmt.Sprintf("/tempaudio/%s", filename)
+
+	if err := ctx.SaveUploadedFile(file, path); err != nil {
+		log.Println("err: ", err)
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	buf := bytes.NewBuffer(nil)
+	fileTemp, tempErr := file.Open()
+	if _, err := io.Copy(buf, fileTemp); err != nil || tempErr != nil {
+		log.Println("Could not open audio file ", filename, ", err: ", err.Error(), "or", tempErr)
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "something went wrong"})
+		return
+	}
+
+	caseIDInt, _ := strconv.ParseInt(case_id, 10, 64)
+	gptResp, err := c.serv.ProcessInterview(int(caseIDInt), buf.Bytes(), path)
+	if err != nil {
+		log.Println("Unsuccessful process, err: ", err)
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "something went wrong"})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gptResp)
+}
+
+func (c *Controller) AddNotesToMeeting(ctx *gin.Context) {
+
+	var notesType types.Notes
+	if err := ctx.BindJSON(&notesType); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "no meeting id provided"})
+		return
+	}
+
+	err := c.serv.AddNotesToMeeting(notesType.MeetingID, notesType.Notes)
+	if err == database.ErrNoMeetingFound {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "invalid meeting id provided"})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{"status": "success"})
 }

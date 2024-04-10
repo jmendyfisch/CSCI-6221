@@ -2,16 +2,24 @@ package database
 
 import (
 	"context"
+	"errors"
 	"log"
 	"server/config"
 	"server/types"
 	"strings"
 
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 var (
 	conn *pgxpool.Pool
+)
+
+var (
+	ErrMeetingInsert  error = errors.New("could not add a new meeting")
+	ErrInvalidLawyer  error = errors.New("lawyer does not exist")
+	ErrNoMeetingFound error = errors.New("no meeting found with given id")
 )
 
 func Init() {
@@ -84,4 +92,48 @@ func GetLawyerByEmail(c types.LawyerLogin) (int, string, error) {
 	}
 
 	return id, password, nil // Return the password and nil as the error
+}
+
+func AddNewMeetingDetails(caseID int, gptResp types.GPTPromptOutput) (err error) {
+	log.Println("inside database.AddNewMeetingDetails()")
+
+	var meetingID int
+	row := conn.QueryRow(context.Background(), CreateMeetingQ, caseID)
+	err = row.Scan(&meetingID)
+	if err != nil {
+		return
+	}
+
+	questions, points := "", ""
+	for _, iter := range gptResp.Questions {
+		questions += iter + ", "
+	}
+
+	for _, iter := range gptResp.AdditionalPoints {
+		points += iter + ", "
+	}
+
+	row = conn.QueryRow(context.Background(), CreateGPTRespQ, meetingID, questions, gptResp.Summary, points)
+	err = row.Scan(&meetingID)
+	if err != nil {
+		log.Println("db error: ", err)
+	}
+
+	return ErrMeetingInsert
+}
+
+func AddNotesToMeeting(meetingID int, notes string) error {
+	log.Println("inside database.AddNotesToMeeting()")
+
+	row := conn.QueryRow(context.Background(), AddNotesToMeetingQ, meetingID, notes)
+	err := row.Scan(&meetingID)
+
+	if err != nil {
+		log.Println("db error: ", err)
+		if err == pgx.ErrNoRows {
+			return ErrNoMeetingFound
+		}
+	}
+
+	return err
 }

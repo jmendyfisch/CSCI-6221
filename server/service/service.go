@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"fmt"
 	"log"
 	"server/database"
 	"server/types"
@@ -72,24 +73,50 @@ func (s *Service) AuthenticateLawyer(c types.LawyerLogin) (Success bool, LawyerI
 		return false, id, err
 	}
 
-	/* Code used to debug if passwords aren't matching
+	fmt.Println("password hashes: ", password, c.Password)
+
+	// Code used to debug if passwords aren't matching
 
 	var ErrHashingPassword = errors.New("error hashing password")
 
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(c.Password), bcrypt.DefaultCost)
 	if err != nil {
 		log.Println("bcrypt error: ", err.Error())
-		return false, ErrHashingPassword
+		return false, 0, ErrHashingPassword
 	}
 
 	log.Println(string(hashedPassword))
-	log.Println("in db:" + password)*/
+	log.Println("in db:" + password)
 
 	// Compare the hashed password with the stored password
 	err = bcrypt.CompareHashAndPassword([]byte(password), []byte(c.Password))
+	return err != nil, id, nil // Password does not match
+}
+
+func (s *Service) ProcessInterview(caseID int, interviewAudio []byte, filepath string) (gptRes types.GPTPromptOutput, err error) {
+	// step 1 - convert audio to text
+
+	interviewText, err := getTextFromAudio(filepath)
 	if err != nil {
-		return false, id, nil // Password does not match
+		return
 	}
 
-	return true, id, nil // Success
+	fmt.Println("interview text: ", interviewText)
+
+	// step 2 - send text, ask to split it into lawyer and client, get summary and addtl questions to ask client.
+	gptRes, err = getOutputTextFromTranscription(interviewText)
+	if err != nil {
+		return
+	}
+
+	// store and return result
+	err = database.AddNewMeetingDetails(caseID, gptRes)
+
+	return
+	// optionally ask for the client's summary
+}
+
+func (s Service) AddNotesToMeeting(meetingID int, notes string) (err error) {
+	err = database.AddNotesToMeeting(meetingID, notes)
+	return
 }
