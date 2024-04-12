@@ -176,6 +176,80 @@ func (c *Controller) CreateNewLawyer(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, resp)
 }
 
+func (c *Controller) CheckLogin(ctx *gin.Context, next string, redirect string, caseID string, meetingID string) {
+	//Login implementing simple custom-built security. This passes three cookies.
+	//The security string is based on the lawyerID, a secret (CookieKey), and a timestamp.
+	//Without knowing the secret word or stealing the cookies, an attacker wouldn't
+	//be able to guess the security string.
+
+	// Check if lawyerID cookie exists.
+	lawyerID, err1 := ctx.Cookie("lawyer_id")
+	securitystring, err2 := ctx.Cookie("securitystring")
+	timestamp, err3 := ctx.Cookie("securitytimestamp")
+
+	if err1 != nil || err2 != nil || err3 != nil {
+		// If the cookie doesn't exist, redirect to the login page
+		log.Println("Missing one or more required cookies.")
+		if redirect != "" {
+			ctx.Redirect(http.StatusFound, redirect)
+
+		} else {
+			ctx.JSON(http.StatusOK, gin.H{"message": "not authenticated"})
+		}
+		return
+	}
+
+	if caseID != "" {
+		lawyerIDInt, _ := strconv.ParseInt(lawyerID, 10, 64)
+		caseIDInt, _ := strconv.ParseInt(caseID, 10, 64)
+		Cases, _ := database.GetAllCasesForLawyer(int(lawyerIDInt))
+
+		log.Println(lawyerIDInt)
+		log.Println(caseIDInt)
+
+		caseFound := false
+		for _, caseObj := range Cases {
+			log.Println("In Cases loop")
+			log.Println(caseObj.ID)
+			if caseObj.ID == int(caseIDInt) {
+				caseFound = true
+				break
+			}
+		}
+
+		if !caseFound {
+			log.Println("Case ID not found for the lawyer")
+			ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized access to the case"})
+			return
+		}
+	}
+
+	data := config.CookieKey + timestamp + lawyerID
+	hash := sha256.Sum256([]byte(data))
+
+	if hex.EncodeToString(hash[:]) == securitystring {
+		// If everything matches, return lawyer id, proceed to display cases.
+		data := gin.H{"message": "authenticated", "lawyer_id": lawyerID, "timestamp": timestamp, "securitystring": securitystring, "case_id": caseID, "meeting_id": meetingID}
+		if next != "" {
+			ctx.HTML(http.StatusOK, next, data)
+			return
+		}
+		ctx.JSON(http.StatusOK, data)
+
+	} else {
+		if redirect != "" {
+			log.Println(redirect)
+			ctx.Redirect(http.StatusFound, redirect)
+
+		} else {
+			ctx.JSON(http.StatusOK, gin.H{"message": "not authenticated"})
+		}
+
+		return
+	}
+
+}
+
 func (c *Controller) AuthenticateLawyer(ctx *gin.Context) {
 	var lawyer types.LawyerLogin
 	var err error

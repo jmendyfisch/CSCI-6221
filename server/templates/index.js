@@ -9,20 +9,34 @@ const validStateCodes = [
 
 
 window.onload = function() {
-    // Parse cookies into an object
-    var cookies = document.cookie.split(';').reduce((cookies, item) => {
-        var [ name, value ] = item.split('=');
-        cookies[name.trim()] = value;
-        return cookies;
-    }, {});
+    //fucntion to check if the user is logged - via the authentication in the backend.
+    
+    fetch('/check_login', {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            console.log(data.error);
+        }
+        else {
 
-    // Check if lawyer_id cookie is set
-    if (cookies.lawyer_id) {
-        // If it is, hide the login button and show the logout and lawyer view buttons
-        document.getElementById('loginButton').style.display = 'none';
-        document.getElementById('logoutButton').style.display = 'inline-block';
-        document.getElementById('lawyerView').style.display = 'inline-block';
-    }
+            // Check if lawyer_id is set
+            if (data.lawyer_id) {
+                // If it is, hide the login button and show the logout and lawyer view buttons
+                document.getElementById('loginButton').style.display = 'none';
+                document.getElementById('logoutButton').style.display = 'inline-block';
+                document.getElementById('lawyerView').style.display = 'inline-block';
+            }
+        }
+    })
+    .catch((error) => {
+        console.error('Error:', error);
+    });
+
 }
 
 

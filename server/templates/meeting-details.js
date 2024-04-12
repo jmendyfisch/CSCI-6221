@@ -14,8 +14,8 @@ async function fetchMeetingInfo(caseId) {
 async function fetchGptResponses(caseId) {
     // Placeholder: Fetch GPT responses from your backend here
     return [
-        { id: 1, question: 'What is the case about?', summary: 'Case regarding property dispute.', points: 'Ask the client about his lease' },
-        { id: 2, question: 'What actions have been taken?', summary: 'Initial documentation filed.', points: 'Ask what court it is' }
+        { id: 1, question: 'What is the case about? What actions have been taken?', summary: 'Case regarding property dispute.', points: 'Ask the client about his lease' },
+        { id: 2, question: 'How are you feeling today? How much is your rent?' , summary: 'Initial documentation filed.', points: 'Ask what court it is' }
     ];
 }
 

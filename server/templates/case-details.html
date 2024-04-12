@@ -6,6 +6,13 @@
     <title>AI Intake Assistant - Case Details</title>
     <link rel="stylesheet" href="/templates/style.css">
 </head>
+<script>
+    const lawyerId = "{{.lawyer_id}}"; // Check to make sure lawyerID passed from the server before loading rest of page.
+    if (!lawyerId) {
+        window.location.href = '/lawyer-login'; // Redirect to login page.
+    }
+</script>
+
 <body>
     <div class="container">
         <h1><img src="/templates/robot_logo.png" height="40px"> Case Details</h1>
