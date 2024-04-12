@@ -11,20 +11,39 @@
     if (!lawyerId) {
         window.location.href = '/lawyer-login'; // Redirect to login page.
     }
+
+    var GLOBALS = {
+        lawyerId: "{{.lawyer_id}}",
+        caseId: "{{.case_id}}"
+    };
+
 </script>
 
 <body>
     <div class="container">
-        <h1><img src="/templates/robot_logo.png" height="40px"> Case Details</h1>
-        <a href="/view-cases" class="button backToCases" style="display:inline-block">Back to Cases</a>
-        
+        <h1><img src="/templates/robot_logo.png" height="40px">AI-Assisted Intake: Case Details</h1>
+        <h3>Here's everything to know about this case. Click on a meeting timestamp to see more details about that meeting. Click the button to create a new meeting:</h3>   
+        <a href="/intake/{{.case_id}}" class="button" style="display:inline-block;">New Meeting</a>
+        <a href="/display-cases" class="button lawyerView" id="lawyerView" style="display:inline-block">Back to Cases</a>
+        <a href="/log-out" class="button logoutButton" id="logoutButton" style="display:inline-block">Logout</a>
         <div id="clientInfo">
             <h4>Client Information</h4>
+            
             <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Phone Number</th>
+                        <th>Email Address</th>
+                        <th>Street Address</th>
+                    </tr>
+                </thead>
                 <tbody>
-                    <!-- Client information will be populated here -->
+                    <!-- Client information will be populated here in populateClientInfo() -->
                 </tbody>
             </table>
+            
+
         </div>
         
         <div id="meetingDetails">

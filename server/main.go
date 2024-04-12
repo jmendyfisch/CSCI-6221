@@ -59,7 +59,7 @@ func SetEndpoints(r *gin.Engine, c *controller.Controller) {
 		}
 
 		// Pass caseID to the CheckLogin
-		c.CheckLogin(ctx, "case-details.html", "/lawyer-login", caseID, "")
+		c.CheckLogin(ctx, "case-details.html", "/display-cases", caseID, "")
 
 	})
 
@@ -77,7 +77,7 @@ func SetEndpoints(r *gin.Engine, c *controller.Controller) {
 		}
 
 		// Pass caseID and meeting id to the CheckLogin
-		c.CheckLogin(ctx, "meeting-details.html", "/lawyer-login", caseID, meetingID)
+		c.CheckLogin(ctx, "meeting-details.html", "/display-cases", caseID, meetingID)
 
 	})
 

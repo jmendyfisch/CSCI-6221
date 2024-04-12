@@ -219,8 +219,15 @@ func (c *Controller) CheckLogin(ctx *gin.Context, next string, redirect string, 
 
 		if !caseFound {
 			log.Println("Case ID not found for the lawyer")
-			ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized access to the case"})
+
+			if redirect != "" {
+				ctx.Redirect(http.StatusFound, redirect)
+
+			} else {
+				ctx.JSON(http.StatusOK, gin.H{"error": "Unauthorized access to the case"})
+			}
 			return
+
 		}
 	}
 
@@ -238,13 +245,12 @@ func (c *Controller) CheckLogin(ctx *gin.Context, next string, redirect string, 
 
 	} else {
 		if redirect != "" {
-			log.Println(redirect)
+			//log.Println(redirect)
 			ctx.Redirect(http.StatusFound, redirect)
 
 		} else {
 			ctx.JSON(http.StatusOK, gin.H{"message": "not authenticated"})
 		}
-
 		return
 	}
 

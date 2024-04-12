@@ -78,7 +78,7 @@ input[type="submit"] {
 }
 
 .lawyerView{
-    right:80px;
+    right:90px;
     display: none;
 }
 
@@ -246,7 +246,7 @@ th {
 }
 
 th:hover{
-   color: #007bff
+   color: #007bff 
 }
 
 tr:nth-child(even) {
@@ -260,11 +260,12 @@ tr:nth-child(odd) {
 a.table-link {
     color: black; /* Initial color for links in table */
     text-decoration: none; /* Removes underline from links */
+    transition: color 0.3s, font-weight 0.3s; 
 }
 
 /*
 a.table-link:hover {
-    color: darkblue; /
+    color: darkblue; 
     font-weight: bold;
 }*/
 
@@ -278,9 +279,15 @@ a.table-link:hover {
     font-weight: inherit; /* Same for font weight */
 }
 
-.backToCases {
-    margin-bottom: 20px; /* Gives some space above the back button */
-  }
+
+
+/* Specific hover state for links within the row to make them stand out */
+table tr td a.table-link:hover {
+    color: #0056b3 !important; /* Ensures this color takes precedence */
+    font-weight: bold; /* Optional: makes the hovered link bold */
+}
+
+
   
   #clientInfo, #meetingDetails {
     margin-top: 20px;
@@ -297,12 +304,56 @@ a.table-link:hover {
   }
   
   #meetingDetails th {
-    background-color: #007bff; /* Primary color for headers for consistency */
+    background-color: black;
     color: white; /* Ensures text in headers is readable */
     padding: 10px; /* More prominent padding for headers */
   }
   
-  .table-link:hover {
-    color: #0056b3; /* Darker shade when hovered for better user interaction feedback */
+  
+  
+  
+  .client-info-header, .meeting-details-header {
+    background-color: #000;
+    color: #fff;
   }
   
+  .sortable:hover {
+    color: #007bff;
+  }
+  
+  .meeting-time-column {
+    width: 20%;
+  }
+  
+  .lawyer-notes-column {
+    width: 80%;
+  }
+  
+#meetingDetails th:hover {
+    background-color: #000; /* Keeps the background color the same */
+    color: white; /* Keeps the text color the same */
+    cursor:auto
+}
+
+.meeting-time-column a.table-link:hover {
+    color: #0056b3; /* Changes the link color to dark blue */
+    font-weight: bold; /* Makes the link text bold */
+}
+
+/* Ensures non-header table cells in the Client Information section have black text */
+#clientInfo td {
+    color: black; /* Sets text color to black */
+}
+
+/* Styles for the Client Information header to have a white background with black text */
+.client-info-header {
+    background-color: #fff; /* Sets background color to white */
+    color: black; /* Sets text color to black */
+}
+
+/* Prevents any change in background or text color when hovering over table headers in the Client Information section */
+#clientInfo th:hover {
+    background-color: black; /* Keeps the background color white */
+    color: white; /* Keeps the text color black */
+    cursor: default; /* Changes cursor to default to indicate non-interactivity */
+}

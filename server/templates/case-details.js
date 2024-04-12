@@ -2,6 +2,7 @@
 async function fetchClientInfo(caseId) {
     // Placeholder: Fetch client info from your backend here
     return {
+        
         name: 'John Doe',
         phoneNumber: '123-456-7890',
         emailAddress: 'johndoe@example.com',
@@ -13,14 +14,15 @@ async function fetchClientInfo(caseId) {
 async function fetchMeetings(caseId) {
     // Placeholder: Fetch meetings from your backend here
     return [
-        { meetingTime: '2024-04-12T10:00:00Z', lawyerNotes: 'Initial consultation', meetingId: 1 },
+        { meetingTime: '2024-04-12T10:00:00Z', lawyerNotes: 'Initial consultation', meetingId: 1},
         { meetingTime: '2024-04-19T14:00:00Z', lawyerNotes: 'Follow-up meeting', meetingId: 2 }
     ];
 }
 
 function createLink(meetingId, text) {
     const link = document.createElement('a');
-    link.href = `/meeting_details/${meetingId}`;
+    
+    link.href = `/meeting-details/${GLOBALS.caseId}/${meetingId}`;
     link.classList.add('table-link');
     link.textContent = text;
     return link.outerHTML;
@@ -29,22 +31,28 @@ function createLink(meetingId, text) {
 function populateClientInfo(clientInfo) {
     const tableBody = document.querySelector('#clientInfo table tbody');
     tableBody.innerHTML = `
-        <tr><td>Name</td><td>${clientInfo.name}</td></tr>
-        <tr><td>Phone Number</td><td>${clientInfo.phoneNumber}</td></tr>
-        <tr><td>Email Address</td><td>${clientInfo.emailAddress}</td></tr>
-        <tr><td>Street Address</td><td>${clientInfo.streetAddress}</td></tr>
-        <tr><td>Case Description</td><td>${clientInfo.caseDescription}</td></tr>
+        <tr><td>${clientInfo.name}</td><td>${clientInfo.phoneNumber}</td><td>${clientInfo.emailAddress}</td><td>${clientInfo.streetAddress}</td></tr>
+        <tr><td colspan="4"><b>Client case description:</b> ${clientInfo.caseDescription}</td></tr>
+        <tr><td colspan="4"><b>AI-generated case summary:</b> [Your AI Summary Here]</td></tr>
     `;
 }
 
+
 function generateTableRow(meetingInfo) {
+    // Convert meetingTime to desired format here
+    const meetingDate = new Date(meetingInfo.meetingTime);
+    const formattedDate = meetingDate.toLocaleDateString('en-US', {
+        month: 'short', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'
+    });
+
     const row = document.createElement('tr');
     row.innerHTML = `
-        <td>${createLink(meetingInfo.meetingId, meetingInfo.meetingTime)}</td>
-        <td>${meetingInfo.lawyerNotes}</td>
+        <td class="meeting-time-column">${createLink(meetingInfo.meetingId, formattedDate)}</td>
+        <td class="lawyer-notes-column">${meetingInfo.lawyerNotes}</td>
     `;
     return row;
 }
+
 
 async function populateMeetings(caseId) {
     const meetings = await fetchMeetings(caseId);
@@ -63,3 +71,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     await populateMeetings(caseId);
 });
+
+
+
