@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Intake Assistant - Case Details</title>
+    <link rel="stylesheet" href="/templates/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1><img src="/templates/robot_logo.png" height="40px"> Case Details</h1>
+        <a href="/view-cases" class="button backToCases" style="display:inline-block">Back to Cases</a>
+        
+        <div id="clientInfo">
+            <h4>Client Information</h4>
+            <table>
+                <tbody>
+                    <!-- Client information will be populated here -->
+                </tbody>
+            </table>
+        </div>
+        
+        <div id="meetingDetails">
+            <h4>Meetings</h4>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Meeting Time</th>
+                        <th>Lawyer Notes</th>
+                    </tr>
+                </thead>
+                <tbody id="meetingsBody">
+                    <!-- Meetings will be populated here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <script src="/templates/case-details.js"></script>
+</body>
+</html>

@@ -1,18 +1,23 @@
 
 // Mock data fetching function
-async function fetchCases() {
+async function fetchCases(assigned) {
     // Placeholder: Fetch cases from your backend here
+    if(assigned) {
     return [
-        { lastName: 'Doe', firstName: 'John', caseType: 'Civil', dateInitiated: '2023-01-01', caseId: 1 },
-        { lastName: 'Smith', firstName: 'Jim', caseType: 'Landlord', dateInitiated: '2023-02-01', caseId: 3 },
-        { lastName: 'Lee', firstName: 'Jane', caseType: 'Criminal', dateInitiated: '2023-03-01', caseId: 2 },
-        { lastName: 'Jones', firstName: 'Betty', caseType: 'Divorce', dateInitiated: '2023-04-01', caseId: 4 },
-    ]; // Return fetched cases
+        { lastName: 'Lee', firstName: 'Jane', caseType: 'Criminal', dateInitiated: '2023-03-01', caseId: 2, assigned: 1 },
+        { lastName: 'Jones', firstName: 'Betty', caseType: 'Divorce', dateInitiated: '2023-04-01', caseId: 4, assigned: 1 }
+    ]; 
+    } else {
+    return [
+        { lastName: 'Doe', firstName: 'John', caseType: 'Civil', dateInitiated: '2023-01-01', caseId: 1, assigned:0 },
+        { lastName: 'Smith', firstName: 'Jim', caseType: 'Landlord', dateInitiated: '2023-02-01', caseId: 3, assigned: 0 }
+    ]
+    }
 }
 
 function createLink(caseId, text) {
     const link = document.createElement('a');
-    link.href = `/case_details/${caseId}`;
+    link.href = `/case-details/${caseId}`;
     link.classList.add('table-link');
     link.textContent = text;
     return link.outerHTML;
@@ -73,8 +78,8 @@ function sortTable(tableId, column) {
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
-    const assignedCases = await fetchCases(); // Fetch assigned cases
-    const unassignedCases = await fetchCases(); // Fetch unassigned cases (this might be a different fetch in a real application)
+    const assignedCases = await fetchCases(true); // Fetch assigned cases
+    const unassignedCases = await fetchCases(false); // Fetch unassigned cases (this might be a different fetch in a real application)
     await populateTable('assignedCases', assignedCases); // Use the ID of the div, not the tbody
     await populateTable('unassignedCases', unassignedCases); // Use the ID of the div, not the tbody
 

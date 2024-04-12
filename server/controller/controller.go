@@ -140,54 +140,7 @@ func (c *Controller) AuthenticateLawyer(ctx *gin.Context) {
 	log.Println("success for controller.AuthenticateLawyer()")
 	ctx.JSON(http.StatusOK, gin.H{"message": "authenticated", "lawyer_id": LawyerID, "timestamp": timeStampStr, "securitystring": securityString})
 
-	// I tried to do the Gorilla Cookie thing. That didn't work. I'm commenting out all the Gorilla stuff and will delete later.
-	/*
-			request := ctx.Request
-			session, err := c.store.Get(ctx.Request, "session-name")
-			if err != nil {
-				log.Println("Error retrieving session:", err)
-				ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-				return
-			}
-			ctx.Set("session", session)
-			ctx.Set("lawyer_id", LawyerID)
-
-			// Set lawyer ID in session
-			session.Values["lawyer_id"] = LawyerID
-
-			session.Options = &sessions.Options{
-				Path:     "/",   // Available throughout the site
-				MaxAge:   86400, // Expires after 1 day
-				HttpOnly: false, // Make accessible via JavaScript
-				Secure:   false, // When running in localhost, we are not over HTTPS
-				SameSite: http.SameSiteLaxMode,
-			}
-
-		// Save the session
-		err = session.Save(request, response)
-		if err != nil {
-			log.Println("Error saving session:", err)
-			http.Error(response, "Internal Server Error", http.StatusInternalServerError)
-			return
-		}
-
-		//session_test, _ := store.Get(request, "session-name")
-		//lawyer_id_test := session_test.Values["lawyer_id"]
-		//log.Println("lawyer_id in session test:", lawyer_id_test)
-	*/
 }
-
-// func (c *Controller) ReturnLawyerSession(request *http.Request) (int, error) {
-// 	session, err := store.Get(request, "session-name")
-// 	if err != nil {
-// 		log.Println("Error retrieving session:", err)
-// 		return 0, err
-// 	}
-
-// 	lawyer_id := session.Values["lawyer_id"]
-// 	log.Println("lawyer_id in session:", lawyer_id)
-// 	return lawyer_id.(int), nil
-// }
 
 func (c *Controller) ProcessInterview(ctx *gin.Context) {
 	// get audio file

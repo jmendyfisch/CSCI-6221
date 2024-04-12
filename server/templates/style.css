@@ -277,3 +277,32 @@ a.table-link:hover {
     color: inherit; /* This makes the link use the current text color, which we set to dark blue on row hover */
     font-weight: inherit; /* Same for font weight */
 }
+
+.backToCases {
+    margin-bottom: 20px; /* Gives some space above the back button */
+  }
+  
+  #clientInfo, #meetingDetails {
+    margin-top: 20px;
+  }
+  
+  #clientInfo table, #meetingDetails table {
+    width: 100%; /* Makes the tables use the full container width */
+    border-collapse: collapse; /* Improves the look by merging cell borders */
+  }
+  
+  #clientInfo td, #meetingDetails td {
+    padding: 8px; /* Adds padding for better readability */
+    border: 1px solid #ddd; /* Light border for each cell for distinction */
+  }
+  
+  #meetingDetails th {
+    background-color: #007bff; /* Primary color for headers for consistency */
+    color: white; /* Ensures text in headers is readable */
+    padding: 10px; /* More prominent padding for headers */
+  }
+  
+  .table-link:hover {
+    color: #0056b3; /* Darker shade when hovered for better user interaction feedback */
+  }
+  

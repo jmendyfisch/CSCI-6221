@@ -29,38 +29,10 @@ func main() {
 
 }
 
-// gorilla session middleware
-/*  This was me trying to implement gorilla sessions. I couldn't get it to work.
-func GorillaSessionMiddleware(store *sessions.CookieStore) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		// Load session
-		session, err := store.Get(c.Request, "session-name")
-		if err != nil {
-			log.Printf("Error loading session: %v", err)
-			c.AbortWithStatus(http.StatusInternalServerError)
-			return
-		}
-
-		// Make the session available in the context
-		c.Set("session", session)
-
-		c.Next()
-
-		// Save the session
-		err = sessions.Save(c.Request, c.Writer)
-		if err != nil {
-			log.Printf("Error saving session: %v", err)
-			c.AbortWithStatus(http.StatusInternalServerError)
-			return
-		}
-	}
-}
-*/
-
 // Sets all the endpoints for the Gin router
 func SetEndpoints(r *gin.Engine, c *controller.Controller) {
 
-	r.LoadHTMLFiles("templates/index.html", "templates/intake.html", "templates/lawyer-login.html", "templates/display-cases.html", "templates/new-account.html")
+	r.LoadHTMLFiles("templates/index.html", "templates/intake.html", "templates/lawyer-login.html", "templates/display-cases.html", "templates/new-account.html", "templates/case-details.html", "templates/meeting-details.html")
 
 	r.POST("/save-audio", func(ctx *gin.Context) {
 		c.ProcessInterview(ctx)
@@ -80,6 +52,14 @@ func SetEndpoints(r *gin.Engine, c *controller.Controller) {
 
 	r.GET("/new-account", func(ctx *gin.Context) {
 		ctx.HTML(http.StatusOK, "new-account.html", gin.H{})
+	})
+
+	r.GET("/case-details", func(ctx *gin.Context) {
+		ctx.HTML(http.StatusOK, "case-details.html", gin.H{})
+	})
+
+	r.GET("/meeting-details", func(ctx *gin.Context) {
+		ctx.HTML(http.StatusOK, "meeting-details.html", gin.H{})
 	})
 
 	r.GET("/display-cases", func(ctx *gin.Context) {

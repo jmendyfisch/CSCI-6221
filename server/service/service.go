@@ -72,26 +72,18 @@ func (s *Service) AuthenticateLawyer(c types.LawyerLogin) (Success bool, LawyerI
 		return false, id, err
 	}
 
-	log.Println("passwords: ", password, c.Password)
+	//log.Println("passwords: ", password, c.Password)
 
-	return password == c.Password, id, nil
+	//return password == c.Password, id, nil
 
-	// Code used to debug if passwords aren't matching
-
-	// var ErrHashingPassword = errors.New("error hashing password")
-
-	// hashedPassword, err := bcrypt.GenerateFromPassword([]byte(c.Password), bcrypt.DefaultCost)
-	// if err != nil {
-	// 	log.Println("bcrypt error: ", err.Error())
-	// 	return false, 0, ErrHashingPassword
-	// }
-
-	// log.Println(string(hashedPassword))
-	// log.Println("in db:" + password)
 
 	// Compare the hashed password with the stored password
-	// err = bcrypt.CompareHashAndPassword([]byte(password), []byte(c.Password))
-	// return err != nil, id, nil // Password does not match
+	err = bcrypt.CompareHashAndPassword([]byte(password), []byte(c.Password))
+	if err != nil {
+		return false, id, nil // Password does not match
+	}
+
+	return true, id, nil // Success
 }
 
 func (s *Service) ProcessInterview(caseID int, interviewAudio []byte, filepath string) (gptRes types.GPTPromptOutput, err error) {

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Intake Assistant - Meeting Details</title>
+    <link rel="stylesheet" href="/templates/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1><img src="/templates/robot_logo.png" height="40px"> Meeting Details</h1>
+        <a href="/view-cases" class="button backToCases" style="display:inline-block">Back to Cases</a>
+        
+        <div id="meetingDetails">
+            <h4>Meeting Information</h4>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Meeting Time</th>
+                        <th>Client First Name</th>
+                        <th>Client Last Name</th>
+                        <th>Phone Number</th>
+                        <th>Email</th>
+                        <th>Lawyer Notes</th>
+                    </tr>
+                </thead>
+                <tbody id="meetingDetailsBody">
+                    <!-- Meeting details will be populated here -->
+                </tbody>
+            </table>
+        </div>
+        
+        <div id="gptResponses">
+            <h4>GPT-Generated Responses</h4>
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Question</th>
+                        <th>Summary</th>
+                        <th>Points</th>
+                    </tr>
+                </thead>
+                <tbody id="gptResponsesBody">
+                    <!-- GPT responses will be populated here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <script src="/templates/meeting-details.js"></script>
+</body>
+</html>
