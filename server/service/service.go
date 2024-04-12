@@ -76,7 +76,6 @@ func (s *Service) AuthenticateLawyer(c types.LawyerLogin) (Success bool, LawyerI
 
 	//return password == c.Password, id, nil
 
-
 	// Compare the hashed password with the stored password
 	err = bcrypt.CompareHashAndPassword([]byte(password), []byte(c.Password))
 	if err != nil {

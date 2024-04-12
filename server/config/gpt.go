@@ -7,10 +7,12 @@ const (
 
 	GPTModel = openai.GPT4
 
-	AnalysisPrompt = `create a JSON response like below using the interview transcription between a lawyer and a client that comes after the json object.
+	AnalysisPrompt = `create a JSON response like below using the interview transcription between a lawyer and a client.
 	{"questions":[list of legal questions for the lawyer to ask the client after the interview that have not been asked],
 	"summary":"summary of the conversation between the client and lawyer",
 	"points":[list of additional points or notes for the lawyer to keep in mind]}`
+)
 
-	AudioFileExtension = `webm`
+var (
+	AudioFileExtensions = []string{"webm", "flac", "mp3", "mp4", "mpeg", "mpga", "m4a", "ogg", "wav"}
 )

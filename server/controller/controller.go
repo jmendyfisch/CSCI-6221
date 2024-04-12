@@ -160,7 +160,15 @@ func (c *Controller) ProcessInterview(ctx *gin.Context) {
 
 	audioType = strings.TrimPrefix(audioType, "audio/")
 
-	if audioType != config.AudioFileExtension {
+	var foundValidExt bool = false
+	for _, ext := range config.AudioFileExtensions {
+		if audioType == ext {
+			foundValidExt = true
+			break
+		}
+	}
+
+	if !foundValidExt {
 		log.Println("incorrect audio type provided")
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Incorrect audio type provided"})
 		return

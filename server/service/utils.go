@@ -37,7 +37,11 @@ func getOutputTextFromTranscription(text string) (res types.GPTPromptOutput, err
 		Messages: []openai.ChatCompletionMessage{
 			{
 				Role:    openai.ChatMessageRoleSystem,
-				Content: config.AnalysisPrompt + "\n" + text,
+				Content: config.AnalysisPrompt,
+			},
+			{
+				Role:    openai.ChatMessageRoleUser,
+				Content: text,
 			},
 		},
 	}
@@ -45,6 +49,7 @@ func getOutputTextFromTranscription(text string) (res types.GPTPromptOutput, err
 	resp, err := client.CreateChatCompletion(context.Background(), req)
 	if err != nil {
 		log.Println("ChatGPT Completion error: ", err)
+		return
 	}
 
 	jsonText := resp.Choices[0].Message.Content
