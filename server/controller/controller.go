@@ -20,7 +20,7 @@ import (
 )
 
 /*
-The Controller handles sending data to the user using g.Context objects.
+The Controller handles sending data to the user using gin.Context objects.
 */
 
 type Controller struct {
@@ -52,6 +52,78 @@ func (c *Controller) GetAllCasesForLawyer(ctx *gin.Context) {
 
 	log.Println("success for controller.GetAllCasesForLawyer()")
 	ctx.JSON(http.StatusOK, cases)
+}
+
+func (c *Controller) GetCaseDetails(ctx *gin.Context) {
+	params := ctx.Request.URL.Query()
+	cIDString := params.Get("case_id")
+	if cIDString == "" {
+		log.Println("no Case ID given")
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "no case id provided"})
+		return
+	}
+
+	cID, _ := strconv.ParseInt(cIDString, 10, 64)
+
+	caseDet, err := c.serv.GetCaseDetails(int(cID))
+
+	if err == database.ErrNoCaseFound {
+		log.Println(err.Error())
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	log.Println("success for controller.GetCaseDetails()")
+	ctx.JSON(http.StatusOK, caseDet)
+}
+
+func (c *Controller) GetAllMeetings(ctx *gin.Context) {
+	params := ctx.Request.URL.Query()
+	cIDString := params.Get("case_id")
+	if cIDString == "" {
+		log.Println("no Case ID given")
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "no case id provided"})
+		return
+	}
+
+	cID, _ := strconv.ParseInt(cIDString, 10, 64)
+
+	meetings, err := c.serv.GetAllMeetings(int(cID))
+
+	if err == service.ErrInvalidCaseID {
+		log.Println(err.Error())
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	log.Println("success for controller.GetAllMeetings()")
+	ctx.JSON(http.StatusOK, meetings)
+}
+
+func (c *Controller) GetMeetingDetails(ctx *gin.Context) {
+	params := ctx.Request.URL.Query()
+	mIDString := params.Get("meeting_id")
+	if mIDString == "" {
+		log.Println("no Meeting ID given")
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "no meeting id provided"})
+		return
+	}
+
+	mID, _ := strconv.ParseInt(mIDString, 10, 64)
+
+	mDet, err := c.serv.GetMeetingDetails(int(mID))
+	if err != nil {
+		if err == database.ErrNoMeetingFound {
+			log.Println("no Meeting ID given")
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": "invalid meeting id provided"})
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "something went wrong"})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, mDet)
+
 }
 
 func (c *Controller) CreateNewCase(ctx *gin.Context) {
@@ -207,6 +279,35 @@ func (c *Controller) ProcessInterview(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, gptResp)
+
+	// generate and update gpt_summary for this case
+	caseDet, err := c.serv.GetCaseDetails(int(caseIDInt))
+	if err != nil {
+		log.Println("error fetching case details: ", err.Error())
+	}
+	desc := caseDet.Description
+
+	meets, err := c.serv.GetAllMeetings(int(caseIDInt))
+	if err != nil {
+		log.Println("error fetching all meetings: ", err.Error())
+	}
+
+	var meetSummaries []string
+	for _, iter := range meets {
+		r, err := c.serv.GetMeetingDetails(iter.ID)
+		if err != nil {
+			log.Println("error fetching meeting details of id: ", iter.ID, err.Error())
+		}
+
+		for _, innerIter := range r.GPTResp {
+			meetSummaries = append(meetSummaries, innerIter.Summary)
+		}
+	}
+
+	err = c.serv.GenAndStoreCaseSummary(int(caseIDInt), desc, meetSummaries)
+	if err != nil {
+		log.Println("error gen and storing case summary: ", err.Error())
+	}
 }
 
 func (c *Controller) AddNotesToMeeting(ctx *gin.Context) {

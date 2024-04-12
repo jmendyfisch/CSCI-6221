@@ -6,6 +6,7 @@ import (
 	"server/database"
 	"server/types"
 
+	"github.com/jackc/pgx/v5"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -22,11 +23,57 @@ func (s *Service) GetAllCases(lawyerID int) (cases []types.Case, err error) {
 
 	cases, err = database.GetAllCasesForLawyer(lawyerID)
 	if err != nil {
-		log.Println("err: ", err.Error())
-		return nil, ErrInvalidLawyerID
+		if err == pgx.ErrNoRows {
+			log.Println("err: ", err.Error())
+			return nil, ErrInvalidLawyerID
+		}
+		return nil, ErrQueryFailure
 	}
 
 	return
+}
+
+func (s *Service) GetCaseDetails(caseID int) (c types.Case, err error) {
+	log.Println("called service.GetAllCases()")
+
+	c, err = database.GetCaseDetails(caseID)
+	c.ID = caseID
+
+	return
+}
+
+func (s *Service) GetAllMeetings(caseID int) (m []types.Meeting, err error) {
+	log.Println("called service.GetAllMeetings()")
+
+	m, err = database.GetAllMeetings(caseID)
+	if err != nil {
+		log.Println("db err: ", err.Error())
+		if err == pgx.ErrNoRows {
+
+			return nil, ErrInvalidCaseID
+		}
+		return nil, ErrQueryFailure
+	}
+
+	return
+
+}
+
+func (s *Service) GetMeetingDetails(meetingID int) (r types.MeetingDetails, err error) {
+	log.Println("called service.GetMeetingDetails()")
+
+	r.Meet, err = database.GetMeetingDetails(meetingID)
+	if err != nil {
+		return r, err
+	}
+
+	r.GPTResp, err = database.GetGPTResponses(meetingID)
+	if err != nil {
+		return r, err
+	}
+
+	return r, nil
+
 }
 
 // Create a new case, it is assigned to a default lawyer
@@ -96,7 +143,7 @@ func (s *Service) ProcessInterview(caseID int, interviewAudio []byte, filepath s
 	log.Println("interview text: ", interviewText)
 
 	// step 2 - send text, ask to split it into lawyer and client, get summary and addtl questions to ask client.
-	gptRes, err = getOutputTextFromTranscription(interviewText)
+	gptRes, err = getOutputTextFromTranscription(caseID, interviewText)
 	if err != nil {
 		return
 	}
@@ -108,7 +155,18 @@ func (s *Service) ProcessInterview(caseID int, interviewAudio []byte, filepath s
 	// optionally ask for the client's summary
 }
 
-func (s Service) AddNotesToMeeting(meetingID int, notes string) (err error) {
+func (s *Service) AddNotesToMeeting(meetingID int, notes string) (err error) {
 	err = database.AddNotesToMeeting(meetingID, notes)
 	return
+}
+
+func (s *Service) GenAndStoreCaseSummary(caseID int, caseDescription string, gptSummaries []string) (err error) {
+
+	summary, err := getCaseSummary(caseDescription, gptSummaries)
+	if err != nil {
+		return err
+	}
+
+	err = database.UpdateCaseSummary(caseID, summary)
+	return err
 }

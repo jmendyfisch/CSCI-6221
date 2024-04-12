@@ -3,8 +3,10 @@ package service
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"log"
 	"server/config"
+	"server/database"
 	"server/types"
 
 	"github.com/sashabaranov/go-openai"
@@ -28,7 +30,17 @@ func getTextFromAudio(audioFilePath string) (s string, err error) {
 	return resp.Text, nil
 }
 
-func getOutputTextFromTranscription(text string) (res types.GPTPromptOutput, err error) {
+func getOutputTextFromTranscription(caseID int, text string) (res types.GPTPromptOutput, err error) {
+
+	var finalText string
+
+	desc, city, state, err := getDetails(caseID)
+	if err != nil {
+		return
+	}
+
+	finalText = "case description: " + desc + "\ncity and state: " + city + ", " + state
+	finalText = finalText + "\n interview transcription: " + text
 
 	client := openai.NewClient(config.OpenAIKey)
 
@@ -41,7 +53,7 @@ func getOutputTextFromTranscription(text string) (res types.GPTPromptOutput, err
 			},
 			{
 				Role:    openai.ChatMessageRoleUser,
-				Content: text,
+				Content: finalText,
 			},
 		},
 	}
@@ -62,4 +74,51 @@ func getOutputTextFromTranscription(text string) (res types.GPTPromptOutput, err
 	}
 
 	return res, nil
+}
+
+func getCaseSummary(desc string, gptSums []string) (string, error) {
+	text := "description - " + desc + "\n meeting summaries - "
+
+	for _, sum := range gptSums {
+		text += "\n" + sum
+	}
+
+	fmt.Println("INPUT TEXT FOR CASE SUMMARY: ", text)
+
+	client := openai.NewClient(config.OpenAIKey)
+
+	req := openai.ChatCompletionRequest{
+		Model: config.GPTModel,
+		Messages: []openai.ChatCompletionMessage{
+			{
+				Role:    openai.ChatMessageRoleSystem,
+				Content: config.CaseSummarizationPrompt,
+			},
+			{
+				Role:    openai.ChatMessageRoleUser,
+				Content: text,
+			},
+		},
+	}
+
+	resp, err := client.CreateChatCompletion(context.Background(), req)
+	if err != nil {
+		log.Println("ChatGPT Case Summary Completion error: ", err)
+		return "", err
+	}
+
+	jsonText := resp.Choices[0].Message.Content
+
+	log.Println("case summary json resp from gpt: \n", jsonText)
+
+	return jsonText, nil
+}
+
+func getDetails(caseID int) (description, city, state string, err error) {
+	c, err := database.GetCaseDetails(caseID)
+	if err != nil {
+		return
+	}
+
+	return c.Description, c.AddressCity, c.AddressState, nil
 }

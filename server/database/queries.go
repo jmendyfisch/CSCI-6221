@@ -3,7 +3,7 @@ package database
 // All the queries for the database
 
 const (
-	GetAllUnassignedCasesQ = `select id, created_at, client_first_name, client_last_name, type, description, phone_number, email_address, from cases where lawyer_id = 0`
+	GetAllCasesQ = `select id, created_at, client_first_name, client_last_name, type, description, phone_number, email_address, lawyer_id from cases where lawyer_id = $1`
 
 	CreateLawyerQ = `insert into lawyers (lawyer_first_name, lawyer_last_name, email_address, password) values ($1, $2, $3, $4) returning email_address`
 
@@ -20,4 +20,14 @@ const (
 	CreateGPTRespQ = `insert into gpt_resp(created_at, meeting_id, questions, summary, points) values (now(), $1, $2, $3, $4) returning id`
 
 	AddNotesToMeetingQ = `update meetings set lawyer_notes = $2 where meeting_id = $1 returning id`
+
+	GetCaseDetailsQ = `select created_at, client_first_name, client_last_name, phone_number, email_address, type, description, lawyer_id, address_street, address_city, address_state, address_zip from cases where id=$1`
+
+	GetAllMeetingsQ = `select id, created_at, case_id, lawyer_id, lawyer_notes from meetings where case_id = $1`
+
+	GetMeetingDetailsQ = `select id, created_at, case_id, lawyer_id, lawyer_notes from meetings where id = $1`
+
+	GetGPTRespsQ = `select id, created_at, meeting_id, questions, summary, points from gpt_resp where meeting_id = $1`
+
+	UpdateCaseSummaryQ = `update cases set gpt_summary = $2 where id = $1 returning true`
 )

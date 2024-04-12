@@ -1,6 +1,9 @@
 package types
 
-import "time"
+import (
+	"database/sql"
+	"time"
+)
 
 type Case struct {
 	ID              int       `json:"id"`
@@ -45,7 +48,29 @@ type GPTPromptOutput struct {
 	AdditionalPoints []string `json:"points" binding:"required"`
 }
 
+type MeetingDetails struct {
+	Meet    Meeting           `json:"meeting"`
+	GPTResp []GPTRespInternal `json:"gpt_resp"`
+}
+
+type GPTRespInternal struct {
+	ID               int       `json:"id"`
+	CreatedAt        time.Time `json:"created_at"`
+	MeetingID        int       `json:"meeting_id"`
+	Questions        string    `json:"questions"`
+	Summary          string    `json:"summary"`
+	AdditionalPoints string    `json:"points"`
+}
+
 type Notes struct {
 	MeetingID int    `json:"meeting_id"`
 	Notes     string `json:"notes"`
+}
+
+type Meeting struct {
+	ID          int            `json:"id"`
+	CreatedAt   time.Time      `json:"created_at"`
+	CaseID      int            `json:"case_id"`
+	LawyerID    int            `json:"lawyer_id"`
+	LawyerNotes sql.NullString `json:"lawyer_notes"`
 }

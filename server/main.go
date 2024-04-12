@@ -58,8 +58,20 @@ func SetEndpoints(r *gin.Engine, c *controller.Controller) {
 		ctx.HTML(http.StatusOK, "case-details.html", gin.H{})
 	})
 
+	r.GET("/get-case-details", func(ctx *gin.Context) {
+		c.GetCaseDetails(ctx)
+	})
+
 	r.GET("/meeting-details", func(ctx *gin.Context) {
 		ctx.HTML(http.StatusOK, "meeting-details.html", gin.H{})
+	})
+
+	r.GET("/get-all-meetings", func(ctx *gin.Context) {
+		c.GetAllMeetings(ctx)
+	})
+
+	r.GET("/get-meetings-details", func(ctx *gin.Context) {
+		c.GetMeetingDetails(ctx)
 	})
 
 	r.GET("/display-cases", func(ctx *gin.Context) {
