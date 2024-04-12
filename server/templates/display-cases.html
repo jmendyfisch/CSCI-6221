@@ -8,10 +8,10 @@
     <link rel="stylesheet" href="/templates/style.css">
 </head>
 <script>
-    const lawyerId = "{{.lawyer_id}}"; // Check to make sure lawyerID passed from the server before loading rest of page.
-    if (!lawyerId) {
-        window.location.href = '/lawyer-login'; // Redirect to login page.
-    }
+    var GLOBALS = {
+        lawyerId: "{{.lawyer_id}}"
+     }; // Check to make sure lawyerID passed from the server before loading rest of page.
+    // alert(GLOBALS.lawyerId)
 </script>
 
 <body>

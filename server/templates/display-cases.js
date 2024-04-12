@@ -1,17 +1,44 @@
 
 // Mock data fetching function
 async function fetchCases(assigned) {
-    // Placeholder: Fetch cases from your backend here
-    if(assigned) {
-    return [
-        { lastName: 'Lee', firstName: 'Jane', caseType: 'Criminal', dateInitiated: '2023-03-01', caseId: 2, assigned: 1 },
-        { lastName: 'Jones', firstName: 'Betty', caseType: 'Divorce', dateInitiated: '2023-04-01', caseId: 4, assigned: 1 }
-    ]; 
-    } else {
-    return [
-        { lastName: 'Doe', firstName: 'John', caseType: 'Civil', dateInitiated: '2023-01-01', caseId: 1, assigned:0 },
-        { lastName: 'Smith', firstName: 'Jim', caseType: 'Landlord', dateInitiated: '2023-02-01', caseId: 3, assigned: 0 }
-    ]
+    const lId = GLOBALS.lawyerId;
+    let assignedInt = 0;
+    let queryParams = { lawyer_id: 1 }; 
+
+    if (assigned) {
+        assignedInt = 1;
+        queryParams = { lawyer_id: lId };
+    }
+
+    const url = '/cases?' + new URLSearchParams(queryParams);
+
+    try {
+        const response = await fetch(url);
+
+        if (!response.ok) {
+            console.log("error receiving data");
+            return [];
+        }
+
+        const data = await response.json();
+
+        if (!data) {
+            return [];
+        }
+
+        const formattedData = data.map(obj => ({
+            lastName: obj.client_last_name,
+            firstName: obj.client_first_name,
+            caseType: obj.type,
+            dateInitiated: obj.created_at.split('T')[0],
+            caseId: obj.id,
+            assigned: assignedInt
+        }));
+
+        return formattedData;
+    } catch (error) {
+        console.error('There was a problem with the fetch operation:', error);
+        return [];
     }
 }
 
@@ -78,6 +105,7 @@ function sortTable(tableId, column) {
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
+
     const assignedCases = await fetchCases(true); // Fetch assigned cases
     const unassignedCases = await fetchCases(false); // Fetch unassigned cases (this might be a different fetch in a real application)
     await populateTable('assignedCases', assignedCases); // Use the ID of the div, not the tbody

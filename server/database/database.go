@@ -111,11 +111,11 @@ func AddNewMeetingDetails(caseID int, gptResp types.GPTPromptOutput) (err error)
 
 	questions, points := "", ""
 	for _, iter := range gptResp.Questions {
-		questions += iter + ", "
+		questions += iter + "\n"
 	}
 
 	for _, iter := range gptResp.AdditionalPoints {
-		points += iter + ", "
+		points += iter + "\n"
 	}
 
 	row = conn.QueryRow(context.Background(), CreateGPTRespQ, meetingID, questions, gptResp.Summary, points)
