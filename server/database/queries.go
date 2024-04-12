@@ -30,4 +30,7 @@ const (
 	GetGPTRespsQ = `select id, created_at, meeting_id, questions, summary, points from gpt_resp where meeting_id = $1`
 
 	UpdateCaseSummaryQ = `update cases set gpt_summary = $2 where id = $1 returning true`
+
+	AssignCaseToLawyerInCasesQ    = `update cases set lawyer_id = $2 where id = $1 returning true`
+	AssignCaseToLawyerInMeetingsQ = `update meetings set lawyer_id = $2 where case_id = $1 returning true`
 )

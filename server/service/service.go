@@ -170,3 +170,7 @@ func (s *Service) GenAndStoreCaseSummary(caseID int, caseDescription string, gpt
 	err = database.UpdateCaseSummary(caseID, summary)
 	return err
 }
+
+func (s *Service) AssignCaseToLawyer(caseID, lawyerID int) (err error) {
+	return database.AssignCaseToLawyer(caseID, lawyerID)
+}

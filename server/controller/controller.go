@@ -400,3 +400,31 @@ func (c *Controller) AddNotesToMeeting(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, gin.H{"status": "success"})
 }
+
+func (c *Controller) AssignCaseToLawyer(ctx *gin.Context) {
+	params := ctx.Request.URL.Query()
+	cIDString := params.Get("case_id")
+	lIDString := params.Get("lawyer_id")
+	if cIDString == "" {
+		log.Println("no Case ID given")
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "no case id provided"})
+		return
+	}
+	if lIDString == "" {
+		log.Println("no Lawyer ID given")
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "no lawyer id provided"})
+		return
+	}
+
+	cID, _ := strconv.ParseInt(cIDString, 10, 64)
+	lID, _ := strconv.ParseInt(lIDString, 10, 64)
+
+	err := c.serv.AssignCaseToLawyer(int(cID), int(lID))
+	if err != nil {
+		log.Println("error assigning case to lawyer: ", err.Error())
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "something went wrong"})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{"success": "lawyer assigned to case successfully"})
+}

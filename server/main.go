@@ -124,6 +124,10 @@ func SetEndpoints(r *gin.Engine, c *controller.Controller) {
 		c.CheckLogin(ctx, "", "", "", "")
 	})
 
+	r.GET("/assign-case", func(ctx *gin.Context) {
+		c.AssignCaseToLawyer(ctx)
+	})
+
 	r.POST("/create_case", func(ctx *gin.Context) {
 		c.CreateNewCase(ctx)
 	})

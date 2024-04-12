@@ -237,3 +237,31 @@ func UpdateCaseSummary(caseID int, summary string) (err error) {
 
 	return
 }
+
+func AssignCaseToLawyer(caseID, lawyerID int) (err error) {
+	log.Println("inside database.AssignCaseToLawyer()")
+
+	var success bool
+
+	row := conn.QueryRow(context.Background(), AssignCaseToLawyerInCasesQ, caseID, lawyerID)
+	err = row.Scan(&success)
+
+	if err != nil {
+		log.Println("db error: ", err)
+		if err == pgx.ErrNoRows {
+			return ErrNoCaseFound
+		}
+	}
+
+	row = conn.QueryRow(context.Background(), AssignCaseToLawyerInMeetingsQ, caseID, lawyerID)
+	err = row.Scan(&success)
+
+	if err != nil {
+		log.Println("db error: ", err)
+		if err == pgx.ErrNoRows {
+			return ErrNoCaseFound
+		}
+	}
+
+	return
+}
