@@ -67,8 +67,6 @@ func SetEndpoints(r *gin.Engine, c *controller.Controller) {
 		c.GetCaseDetails(ctx)
 	})
 
-	r.GET("/meeting-details", func(ctx *gin.Context) {
-		ctx.HTML(http.StatusOK, "meeting-details.html", gin.H{})
 	r.GET("/meeting-details/:case_id/:meeting_id", func(ctx *gin.Context) {
 		caseID := ctx.Param("case_id")
 		meetingID := ctx.Param("meeting_id")
