@@ -7,6 +7,7 @@ import (
 	"log"
 	"server/config"
 	"server/types"
+	"strconv"
 	"strings"
 
 	"github.com/jackc/pgx/v5"
@@ -148,7 +149,7 @@ func GetCaseDetails(caseID int) (c types.Case, err error) {
 	log.Println("inside database.GetCaseDetails()")
 
 	row := conn.QueryRow(context.Background(), GetCaseDetailsQ, caseID)
-	err = row.Scan(&c.CreatedAt, &c.ClientFirstName, &c.ClientLastName, &c.PhoneNumber, &c.EmailAddress, &c.Type, &c.Description, &c.LawyerID, &c.AddressStreet, &c.AddressCity, &c.AddressState, &c.AddressZip)
+	err = row.Scan(&c.CreatedAt, &c.ClientFirstName, &c.ClientLastName, &c.PhoneNumber, &c.EmailAddress, &c.Type, &c.Description, &c.LawyerID, &c.AddressStreet, &c.AddressCity, &c.AddressState, &c.AddressZip, &c.GPTSummary)
 
 	if err != nil {
 		log.Println("db error: ", err)
@@ -246,6 +247,9 @@ func AssignCaseToLawyer(caseID, lawyerID int) (err error) {
 	row := conn.QueryRow(context.Background(), AssignCaseToLawyerInCasesQ, caseID, lawyerID)
 	err = row.Scan(&success)
 
+	log.Println(AssignCaseToLawyerInCasesQ)
+	log.Println("caseID " + strconv.Itoa(caseID) + " lawyerID " + strconv.Itoa(lawyerID))
+
 	if err != nil {
 		log.Println("db error: ", err)
 		if err == pgx.ErrNoRows {
@@ -256,12 +260,14 @@ func AssignCaseToLawyer(caseID, lawyerID int) (err error) {
 	row = conn.QueryRow(context.Background(), AssignCaseToLawyerInMeetingsQ, caseID, lawyerID)
 	err = row.Scan(&success)
 
+	//log.Println(AssignCaseToLawyerInMeetingsQ)
+
 	if err != nil {
-		log.Println("db error: ", err)
 		if err == pgx.ErrNoRows {
-			return ErrNoCaseFound
+			log.Println("Note: This case has no meetings.")
+			return nil
 		}
 	}
 
-	return
+	return 
 }

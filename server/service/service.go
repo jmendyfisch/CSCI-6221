@@ -37,6 +37,7 @@ func (s *Service) GetCaseDetails(caseID int) (c types.Case, err error) {
 	log.Println("called service.GetAllCases()")
 
 	c, err = database.GetCaseDetails(caseID)
+	//log.Println("case: ", c)
 	c.ID = caseID
 
 	return

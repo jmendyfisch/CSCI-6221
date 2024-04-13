@@ -66,6 +66,7 @@ func (c *Controller) GetCaseDetails(ctx *gin.Context) {
 	cID, _ := strconv.ParseInt(cIDString, 10, 64)
 
 	caseDet, err := c.serv.GetCaseDetails(int(cID))
+	//log.Println("caseDet: ", caseDet)
 
 	if err == database.ErrNoCaseFound {
 		log.Println(err.Error())

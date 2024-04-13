@@ -15,18 +15,19 @@
 <body>
     <div class="container">
         <h1><img src="/templates/robot_logo.png" height="40px"> Meeting Details</h1>
-        <a href="/view-cases" class="button backToCases" style="display:inline-block">Back to Cases</a>
-        
+        <h3>Here's everything that happened during this meeting. To create a new meeting for this case, click on the button:</h3>
+        <a href="/intake/{{.case_id}}" class="button" style="display:inline-block;">New Meeting</a>        
+        <a href="/case-details/{{.case_id}}" class="button lawyerView" id="lawyerView" style="display:inline-block">Case Details</a>
+        <a href="/log-out" class="button logoutButton" id="logoutButton" style="display:inline-block">Logout</a>
+
+
         <div id="meetingDetails">
             <h4>Meeting Information</h4>
             <table>
                 <thead>
                     <tr>
                         <th>Meeting Time</th>
-                        <th>Client First Name</th>
-                        <th>Client Last Name</th>
-                        <th>Phone Number</th>
-                        <th>Email</th>
+                        <th>Client Name</th>
                         <th>Lawyer Notes</th>
                     </tr>
                 </thead>
@@ -42,7 +43,7 @@
                 <thead>
                     <tr>
                         <th>#</th>
-                        <th>Question</th>
+                        <th>Questions</th>
                         <th>Summary</th>
                         <th>Points</th>
                     </tr>

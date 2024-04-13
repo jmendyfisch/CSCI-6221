@@ -1,14 +1,5 @@
-// Mock data fetching functions
+// Asynch data fetching functions
 async function fetchMeetingInfo(caseId) {
-    // Placeholder: Fetch meeting info from your backend here
-    // return {
-    //     meetingTime: '2024-04-12T10:00:00',
-    //     clientFirstName: 'John',
-    //     clientLastName: 'Doe',
-    //     phoneNumber: '123-456-7890',
-    //     email: 'johndoe@example.com',
-    //     lawyerNotes: 'Initial meeting for case review.'
-    // };
 
     const mId = GLOBALS.meetingId;
     const cId = GLOBALS.caseId;
@@ -35,7 +26,7 @@ async function fetchMeetingInfo(caseId) {
         }
 
         let formattedData = {
-            meetingTime: meetData.meeting.created_at.split('T')[0],
+            meetingTime: meetData.meeting.created_at,
             clientFirstName: caseData.client_first_name,
             clientLastName: caseData.client_last_name,
             phoneNumber: caseData.phone_number,
@@ -51,11 +42,7 @@ async function fetchMeetingInfo(caseId) {
 }
 
 async function fetchGptResponses(caseId) {
-    // Placeholder: Fetch GPT responses from your backend here
-    // return [
-    //     { id: 1, question: 'What is the case about? What actions have been taken?', summary: 'Case regarding property dispute.', points: 'Ask the client about his lease' },
-    //     { id: 2, question: 'How are you feeling today? How much is your rent?' , summary: 'Initial documentation filed.', points: 'Ask what court it is' }
-    // ];
+    
 
     const mId = GLOBALS.meetingId;
     let queryParams1 = { meeting_id: mId}; 
@@ -92,13 +79,14 @@ async function fetchGptResponses(caseId) {
 
 function populateMeetingInfo(meetingInfo) {
     const tableBody = document.querySelector('#meetingDetailsBody');
+    const meetingDate = new Date(meetingInfo.meetingTime);
+    const formattedDate = meetingDate.toLocaleDateString('en-US', {
+        month: 'short', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'
+    });
     tableBody.innerHTML = `
         <tr>
-            <td>${meetingInfo.meetingTime}</td>
-            <td>${meetingInfo.clientFirstName}</td>
-            <td>${meetingInfo.clientLastName}</td>
-            <td>${meetingInfo.phoneNumber}</td>
-            <td>${meetingInfo.email}</td>
+            <td>${formattedDate}</td>
+            <td>${meetingInfo.clientFirstName+" "+meetingInfo.clientLastName}</td>
             <td>${meetingInfo.lawyerNotes}</td>
         </tr>
     `;

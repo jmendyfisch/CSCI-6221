@@ -21,7 +21,7 @@ const (
 
 	AddNotesToMeetingQ = `update meetings set lawyer_notes = $2 where meeting_id = $1 returning id`
 
-	GetCaseDetailsQ = `select created_at, client_first_name, client_last_name, phone_number, email_address, type, description, lawyer_id, address_street, address_city, address_state, address_zip from cases where id=$1`
+	GetCaseDetailsQ = `select created_at, client_first_name, client_last_name, phone_number, email_address, type, description, lawyer_id, address_street, address_city, address_state, address_zip, gpt_summary from cases where id=$1`
 
 	GetAllMeetingsQ = `select id, created_at, case_id, lawyer_id, lawyer_notes from meetings where case_id = $1`
 

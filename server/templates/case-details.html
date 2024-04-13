@@ -7,10 +7,6 @@
     <link rel="stylesheet" href="/templates/style.css">
 </head>
 <script>
-    const lawyerId = "{{.lawyer_id}}"; // Check to make sure lawyerID passed from the server before loading rest of page.
-    if (!lawyerId) {
-        window.location.href = '/lawyer-login'; // Redirect to login page.
-    }
 
     var GLOBALS = {
         lawyerId: "{{.lawyer_id}}",
@@ -27,7 +23,7 @@
         <a href="/display-cases" class="button lawyerView" id="lawyerView" style="display:inline-block">Back to Cases</a>
         <a href="/log-out" class="button logoutButton" id="logoutButton" style="display:inline-block">Logout</a>
         <div id="clientInfo">
-            <h4>Client Information</h4>
+            <h4>Case Information</h4>
             
             <table>
                 <thead>
@@ -51,7 +47,7 @@
             <table>
                 <thead>
                     <tr>
-                        <th>Meeting Time</th>
+                        <th class="meeting-time-column">Meeting Time</th>
                         <th>Lawyer Notes</th>
                     </tr>
                 </thead>

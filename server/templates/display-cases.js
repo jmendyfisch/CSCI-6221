@@ -1,5 +1,4 @@
-
-// Mock data fetching function
+// Asnyc data fetching function
 async function fetchCases(assigned) {
     const lId = GLOBALS.lawyerId;
     let assignedInt = 0;
@@ -42,21 +41,25 @@ async function fetchCases(assigned) {
     }
 }
 
-function createLink(caseId, text) {
-    const link = document.createElement('a');
-    link.href = `/case-details/${caseId}`;
-    link.classList.add('table-link');
-    link.textContent = text;
-    return link.outerHTML;
+function createLink(caseId, text, assigned) {
+    
+    //console.log("caseId: " + caseId + " text: " + text + " assigned: " + assigned);
+    if(assigned){
+        const link = document.createElement('a');
+        link.href = `/case-details/${caseId}`;
+        link.classList.add('table-link');
+        link.textContent = text;
+        return link.outerHTML;
+    } else return text;
 }
 
 function generateTableRow(caseInfo) {
     const row = document.createElement('tr');
     row.innerHTML = `
-        <td>${createLink(caseInfo.caseId, caseInfo.lastName)}</td>
-        <td>${createLink(caseInfo.caseId, caseInfo.firstName)}</td>
-        <td>${createLink(caseInfo.caseId, caseInfo.caseType)}</td>
-        <td>${createLink(caseInfo.caseId, caseInfo.dateInitiated)}</td>
+        <td>${createLink(caseInfo.caseId, caseInfo.lastName, caseInfo.assigned)}</td>
+        <td>${createLink(caseInfo.caseId, caseInfo.firstName, caseInfo.assigned)}</td>
+        <td>${createLink(caseInfo.caseId, caseInfo.caseType, caseInfo.assigned)}</td>
+        <td>${createLink(caseInfo.caseId, caseInfo.dateInitiated, caseInfo.assigned)}</td>
         <td><button class="assign-btn" data-case-id="${caseInfo.caseId}">${caseInfo.assigned ? 'Detach' : 'Assign'}</button></td>
     `;
     return row;
@@ -70,23 +73,65 @@ async function populateTable(containerId, cases) {
         return;
     }
 
+    tableBody.innerHTML = '';
+
     cases.forEach(caseInfo => {
         tableBody.appendChild(generateTableRow(caseInfo));
     });
 
-    // Add event listeners for assign/detach buttons
-    document.querySelectorAll(`#${containerId} .assign-btn`).forEach(button => {
-        button.addEventListener('click', function() {
-            const caseId = this.getAttribute('data-case-id');
-            if (this.textContent === 'Assign') {
-                // Placeholder: Implement case assignment logic
-                console.log(`Assigning case ID: ${caseId}`);
-            } else {
-                // Placeholder: Implement case detachment logic
-                console.log(`Detaching case ID: ${caseId}`);
-            }
-        });
+async function assignCase(caseId, assignedLawyer) {
+
+    queryParams = { lawyer_id: assignedLawyer, case_id: caseId};
+
+    const url = '/assign-case?' + new URLSearchParams(queryParams);
+
+                try {
+                    const response = await fetch(url);
+            
+                    if (!response.ok) {
+                        console.log("error receiving data");
+                        return [];
+                    }
+            
+                    const data = await response.json();
+            
+                    if (!data) {
+                        return [];
+                    }
+                    
+                    console.log(data);
+            
+                    return;
+                } catch (error) {
+                    console.error('There was a problem with the fetch operation:', error);
+                    return [];
+                }
+}
+// Add event listeners for assign/detach buttons
+document.querySelectorAll(`#${containerId} .assign-btn`).forEach(button => {
+    button.addEventListener('click', async function() { // Make this function async
+        const caseId = this.getAttribute('data-case-id');
+        const lId = GLOBALS.lawyerId;
+        const assignedLawyer = this.textContent === 'Assign' ? lId : 1; // lawyerId for assigning, 1 for detaching
+
+        //console.log(`NEW MSG Assigning case ID: ${caseId} to ${assignedLawyer}`);
+        await assignCase(caseId, assignedLawyer); // Wait for the assignment to complete
+
+        // Now refresh both tables to reflect the change
+        await refreshTables();
     });
+});
+
+}
+
+async function refreshTables() {
+    // Fetch updated case data
+    const assignedCases = await fetchCases(true); // Fetch assigned cases
+    const unassignedCases = await fetchCases(false); // Fetch unassigned cases
+
+    // Clear and repopulate the tables with the updated data
+    await populateTable('assignedCases', assignedCases);
+    await populateTable('unassignedCases', unassignedCases);
 }
 
 

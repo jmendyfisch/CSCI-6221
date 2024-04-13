@@ -293,9 +293,9 @@ table tr td a.table-link:hover {
     margin-top: 20px;
   }
   
-  #clientInfo table, #meetingDetails table {
+  #clientInfo table, #meetingDetails table, #gptResponses table {
     width: 100%; /* Makes the tables use the full container width */
-    border-collapse: collapse; /* Improves the look by merging cell borders */
+    border-collapse: collapse; /* merging cell borders */
   }
   
   #clientInfo td, #meetingDetails td {
@@ -340,6 +340,11 @@ table tr td a.table-link:hover {
     font-weight: bold; /* Makes the link text bold */
 }
 
+#meetingDetails .meeting-time-column:hover {
+    color: #007bff !important;
+    cursor: pointer;
+}
+
 /* Ensures non-header table cells in the Client Information section have black text */
 #clientInfo td {
     color: black; /* Sets text color to black */
@@ -351,9 +356,16 @@ table tr td a.table-link:hover {
     color: black; /* Sets text color to black */
 }
 
-/* Prevents any change in background or text color when hovering over table headers in the Client Information section */
+/*these tables do not need to be sortable*/
 #clientInfo th:hover {
     background-color: black; /* Keeps the background color white */
     color: white; /* Keeps the text color black */
     cursor: default; /* Changes cursor to default to indicate non-interactivity */
 }
+
+#gptResponses th:hover {
+    background-color: black; /* Keeps the background color white */
+    color: white; /* Keeps the text color black */
+    cursor: default; /* Changes cursor to default to indicate non-interactivity */
+}
+

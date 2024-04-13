@@ -12,7 +12,7 @@ const (
 	"summary":"summary of the conversation between the client and lawyer",
 	"points":[list of additional points or notes for the lawyer to keep in mind]}`
 
-	CaseSummarizationPrompt = `create a summary of the given legal case using the case description and meeting summaries provided.`
+	CaseSummarizationPrompt = `create a summary of the given legal case using the case description and meeting summaries provided. don't start with the word 'summary.' maximum length 200 words.`
 )
 
 var (

@@ -19,6 +19,7 @@ type Case struct {
 	AddressCity     string    `json:"address_city"`
 	AddressState    string    `json:"address_state"`
 	AddressZip      string    `json:"address_zip"`
+	GPTSummary      string    `json:"gpt_summary"`
 }
 
 type NewCaseResp struct {
