@@ -1,3 +1,5 @@
+// All utility/helper functions for the Service package.
+
 package service
 
 import (

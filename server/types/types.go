@@ -1,3 +1,5 @@
+// User Defined datatypes for ease of data propagation and encappsulation
+
 package types
 
 import (

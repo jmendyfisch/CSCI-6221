@@ -1,3 +1,5 @@
+// All the service end errors to be propagated.
+
 package service
 
 import "errors"

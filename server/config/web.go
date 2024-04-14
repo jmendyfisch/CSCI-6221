@@ -1,3 +1,5 @@
+// Contains the website configurations.
+
 package config
 
 const (

@@ -1,3 +1,6 @@
+// Contains the OpenAI configurations
+// and the Prompts for Transcription Analysis and Case summarization.
+
 package config
 
 import "github.com/sashabaranov/go-openai"

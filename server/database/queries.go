@@ -1,6 +1,6 @@
-package database
+// All the queries for the database.
 
-// All the queries for the database
+package database
 
 const (
 	GetAllCasesQ = `select id, created_at, client_first_name, client_last_name, type, description, phone_number, email_address, lawyer_id from cases where lawyer_id = $1`

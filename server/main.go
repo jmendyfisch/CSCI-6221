@@ -1,3 +1,5 @@
+// Main file, application server runs here.
+
 package main
 
 import (
@@ -23,7 +25,6 @@ func main() {
 	SetEndpoints(router, &cont)
 
 	router.Run(config.RunPort)
-
 }
 
 // Sets all the endpoints for the Gin router

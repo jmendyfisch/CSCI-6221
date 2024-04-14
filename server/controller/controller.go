@@ -1,3 +1,6 @@
+// The Controller handles all HTTP Requests using *gin.Context objects.
+// It is not cognizant of the internals of the business logic.
+
 package controller
 
 import (
@@ -18,10 +21,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 )
-
-/*
-The Controller handles sending data to the user using gin.Context objects.
-*/
 
 type Controller struct {
 	serv service.Service

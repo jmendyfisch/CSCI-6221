@@ -1,3 +1,8 @@
+/*
+The Database package is responsible for connecting to the Postgres server
+and handling all database queries for the Service package.
+*/
+
 package database
 
 import (
