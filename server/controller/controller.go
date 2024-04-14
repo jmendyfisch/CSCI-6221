@@ -177,11 +177,23 @@ func (c *Controller) CreateNewLawyer(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, resp)
 }
 
-func (c *Controller) CheckLogin(ctx *gin.Context, next string, redirect string, caseID string, meetingID string) {
-	//Login implementing simple custom-built security. This passes three cookies.
-	//The security string is based on the lawyerID, a secret (CookieKey), and a timestamp.
-	//Without knowing the secret word or stealing the cookies, an attacker wouldn't
-	//be able to guess the security string.
+func (c *Controller) CreateNewMeeting(caseID string) (meetingID int, err error) {
+	log.Println("inside controller.CreateNewMeeting()")
+	meetingID, err = c.serv.CreateNewMeeting(caseID)
+	return
+}
+
+func (c *Controller) DeleteMeeting(meetingID string) (err error) {
+	log.Println("inside controller.DeleteMeeting()")
+	err = c.serv.DeleteMeeting(meetingID)
+	return
+}
+
+func (c *Controller) CheckLogin(ctx *gin.Context, next string, redirect string, caseID string, meetingID string) bool {
+	//Login implementing our own security. This passes three cookies.
+	//The security string is based on the lawyerID, a security key that is secret and gets hashed to a security string, and a timestamp.
+	//Without knowing the security key or stealing the cookies, an attacker wouldn't
+	//be able to guess the security string and spoof the cookies.
 
 	// Check if lawyerID cookie exists.
 	lawyerID, err1 := ctx.Cookie("lawyer_id")
@@ -197,7 +209,7 @@ func (c *Controller) CheckLogin(ctx *gin.Context, next string, redirect string, 
 		} else {
 			ctx.JSON(http.StatusOK, gin.H{"message": "not authenticated"})
 		}
-		return
+		return false
 	}
 
 	if caseID != "" {
@@ -210,8 +222,8 @@ func (c *Controller) CheckLogin(ctx *gin.Context, next string, redirect string, 
 
 		caseFound := false
 		for _, caseObj := range Cases {
-			log.Println("In Cases loop")
-			log.Println(caseObj.ID)
+			//log.Println("In Cases loop")
+			//log.Println(caseObj.ID)
 			if caseObj.ID == int(caseIDInt) {
 				caseFound = true
 				break
@@ -227,8 +239,7 @@ func (c *Controller) CheckLogin(ctx *gin.Context, next string, redirect string, 
 			} else {
 				ctx.JSON(http.StatusOK, gin.H{"error": "Unauthorized access to the case"})
 			}
-			return
-
+			return false
 		}
 	}
 
@@ -236,23 +247,23 @@ func (c *Controller) CheckLogin(ctx *gin.Context, next string, redirect string, 
 	hash := sha256.Sum256([]byte(data))
 
 	if hex.EncodeToString(hash[:]) == securitystring {
-		// If everything matches, return lawyer id, proceed to display cases.
+		// If everything matches, return lawyer id, proceed to the page that is requested for next if one exists.
 		data := gin.H{"message": "authenticated", "lawyer_id": lawyerID, "timestamp": timestamp, "securitystring": securitystring, "case_id": caseID, "meeting_id": meetingID}
 		if next != "" {
-			ctx.HTML(http.StatusOK, next, data)
-			return
+			ctx.HTML(http.StatusOK, next, data) //redirect if there is a desired next page
+		} else if caseID == "" {
+			ctx.JSON(http.StatusOK, data) //return json if no next page but don't do it if caseID is provided because that messes up the display of intake.html
 		}
-		ctx.JSON(http.StatusOK, data)
+		return true
 
 	} else {
 		if redirect != "" {
 			//log.Println(redirect)
 			ctx.Redirect(http.StatusFound, redirect)
-
 		} else {
 			ctx.JSON(http.StatusOK, gin.H{"message": "not authenticated"})
 		}
-		return
+		return false
 	}
 
 }
@@ -334,6 +345,14 @@ func (c *Controller) ProcessInterview(ctx *gin.Context) {
 		return
 	}
 
+	meeting_id := ctx.PostForm("meeting_id")
+	log.Println("meeting_id from controller.process interview: ", meeting_id)
+	if meeting_id == "" {
+		log.Println("No meeting id provided")
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "No meeting id provided"})
+		return
+	}
+
 	filename := fmt.Sprintf("rec_case_%s_%v.%s", case_id, time.Now().UnixNano(), audioType)
 	path := fmt.Sprintf("/tempaudio/%s", filename)
 
@@ -352,16 +371,9 @@ func (c *Controller) ProcessInterview(ctx *gin.Context) {
 	}
 
 	caseIDInt, _ := strconv.ParseInt(case_id, 10, 64)
-	gptResp, err := c.serv.ProcessInterview(int(caseIDInt), buf.Bytes(), path)
-	if err != nil {
-		log.Println("Unsuccessful process, err: ", err)
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "something went wrong"})
-		return
-	}
+	meetingIDInt, _ := strconv.ParseInt(meeting_id, 10, 64)
 
-	ctx.JSON(http.StatusOK, gptResp)
-
-	// generate and update gpt_summary for this case
+	// get previous gpt summaries for this case
 	caseDet, err := c.serv.GetCaseDetails(int(caseIDInt))
 	if err != nil {
 		log.Println("error fetching case details: ", err.Error())
@@ -384,6 +396,18 @@ func (c *Controller) ProcessInterview(ctx *gin.Context) {
 			meetSummaries = append(meetSummaries, innerIter.Summary)
 		}
 	}
+	// Process the audio file, also passing the summaries of the previous conversations
+	gptResp, err := c.serv.ProcessInterview(int(caseIDInt), int(meetingIDInt), meetSummaries, buf.Bytes(), path)
+	if err != nil {
+		log.Println("Unsuccessful process, err: ", err)
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "something went wrong"})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gptResp)
+
+	// generate and update gpt_summary for this case
+	meetSummaries = append(meetSummaries, gptResp.Summary) //append the summary from the latest recording
 
 	err = c.serv.GenAndStoreCaseSummary(int(caseIDInt), desc, meetSummaries)
 	if err != nil {
@@ -395,6 +419,7 @@ func (c *Controller) AddNotesToMeeting(ctx *gin.Context) {
 
 	var notesType types.Notes
 	if err := ctx.BindJSON(&notesType); err != nil {
+		log.Printf("Received notes: %+v", notesType)
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "no meeting id provided"})
 		return
 	}

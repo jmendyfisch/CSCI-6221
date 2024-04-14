@@ -64,7 +64,7 @@ type GPTRespInternal struct {
 }
 
 type Notes struct {
-	MeetingID int    `json:"meeting_id"`
+	MeetingID string `json:"meeting_id"`
 	Notes     string `json:"notes"`
 }
 

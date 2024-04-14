@@ -1,8 +1,8 @@
-/* index.js ---------------
-based on "How to record audio in JavaScript" by Reema Alzohairi 
+/* Audio recording portion based on "How to record audio in JavaScript" by Reema Alzohairi 
 https://ralzohairi.medium.com/audio-recording-in-javascript-96eed45b75ee 
 With modifications to submit the audio file to the server via a POST request 
 instead of playing it back in the browser.
+Remainder of file is original for this project.
 */
 //View
 var microphoneButton = document.getElementsByClassName("start-recording-button")[0];
@@ -168,7 +168,7 @@ function stopAudioRecording() {
     //stop the recording using the audio recording API
     audioRecorder.stop()
         .then(audioAsblob => {
-            //Modified to save the audio to a file instead of playing it   
+            //Modified to save the audio to a post request instead of playing it   
             //playAudio(audioAsblob);
             saveAudio(audioAsblob);
 
@@ -247,7 +247,7 @@ function playAudio(recorderAudioAsBlob) {
     
 }
 
-//New function that is implemented for this project to save the audio to a file
+//New function that is implemented for this project to pass the audio to chatGPT and get the response
 function saveAudio(recorderAudioAsBlob) {
     let BlobType = recorderAudioAsBlob.type.includes(";") ?
     recorderAudioAsBlob.type.substr(0, recorderAudioAsBlob.type.indexOf(';')) : recorderAudioAsBlob.type;
@@ -256,21 +256,33 @@ function saveAudio(recorderAudioAsBlob) {
         formData.append('audio', recorderAudioAsBlob);
         formData.append('type', BlobType);
         formData.append('case_id', case_id);
+        formData.append('meeting_id', meeting_id);
+        console.log("Meeting id from intake.js "+meeting_id);
+
+        // Show the loading message
+        document.getElementById('aiResponse').style.display = 'block';
+        document.getElementById('loadingMessage').style.display = 'block';
+        document.getElementById('aiResponseContent').innerHTML = ''; // Clear previous response
+
 
         fetch('/save-audio', {
             method: 'POST',
             body: formData
         })
-        .then(response => {
-        if (response.ok) {
-            console.log('Audio saved successfully');
-            
-        } else {
-            console.error('Error saving audio:', response.statusText);
-        }
-        })
 
-    .catch(error => console.error('Error:', error));
+        .then(response => response.json())
+        .then(data => {
+            // Handle response data here
+            document.getElementById('loadingMessage').style.display = 'none';
+            console.log('Success:', data);
+            const formattedResponse = formatAIResponse(data); // Implement this function based on your data structure
+            document.getElementById('aiResponseContent').innerHTML = formattedResponse;
+        })
+        .catch((error) => {
+            document.getElementById('loadingMessage').innerHTML = 'Error loading AI response.';
+            console.error('Error:', error);
+        });
+
 }
 
 
@@ -366,4 +378,138 @@ function computeElapsedTime(startTime) {
     } else {
         return totalHours + ":" + minutes + ":" + seconds;
     }
+}
+
+//More original code for this project
+async function fetchClientInfo(caseId) {
+
+    const cId = GLOBALS.caseId;
+    let queryParams2 = {case_id: cId};
+
+    const url2 = '/get-case-details?' + new URLSearchParams(queryParams2);
+
+    try {
+        const response2 = await fetch(url2);
+
+        if (!response2.ok) {
+            console.log("error receiving data");
+            return {};
+        }
+
+        const caseData = await response2.json();
+
+        if (!caseData) {
+            return {};
+        }
+        //console.log("caseData: " + caseData);
+        let formattedData = {
+            clientName: caseData.client_first_name+" "+caseData.client_last_name,
+            phoneNumber: caseData.phone_number,
+            email: caseData.email_address,
+            address: caseData.address_street+", "+caseData.address_city+", "+caseData.address_state+" "+caseData.address_zip,
+            description: caseData.description,
+            gptsummary: caseData.gpt_summary
+        };
+
+
+        return formattedData;
+    } catch (error) {
+        console.error('There was a problem with the fetch operation:', error);
+        return [];
+    }
+}
+
+function populateClientInfo(clientInfo) {
+    const tableBody = document.querySelector('#clientInfo table tbody');
+    summaryText = "";
+    if (clientInfo.gptsummary != ""){
+        summaryText = clientInfo.gptsummary;
+        //console.log("summaryText: " + summaryText);
+    }else{
+        summaryText = "Will be created upon completion of first meeting.";
+        //console.log("summaryText: " + summaryText);
+    }
+
+    tableBody.innerHTML = `
+        <tr><td>${clientInfo.clientName}</td><td>${clientInfo.phoneNumber}</td><td>${clientInfo.email}</td><td>${clientInfo.address}</td></tr>
+        <tr><td colspan="4"><b>Client description:</b> ${clientInfo.description}</td></tr>
+        <tr><td colspan="4"><b>AI-generated summary:</b> ${summaryText}</td></tr>
+    `;
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+
+    const caseId = GLOBALS.caseId;
+    const clientInfo = await fetchClientInfo(caseId);
+    populateClientInfo(clientInfo);
+
+});
+
+// Event listener for the "Save Notes" button
+document.getElementById('saveNotesButton').addEventListener('click', function() {
+    // Retrieve the lawyer's notes from the textarea
+    const lawyerNotes = document.getElementById('lawyerNotes').value;
+    const meetingId = GLOBALS.meeting_id;
+
+    // Construct the data to be sent
+    const postData = {
+        meeting_id: meetingId,
+        notes: lawyerNotes
+    };
+
+    console.log(postData);
+
+
+    // Set up the request options for the fetch call
+    const requestOptions = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(postData),
+    };
+
+    // Use the fetch API to send the data to the save_lawyer_notes endpoint
+    fetch('/save_lawyer_notes', requestOptions)
+        .then(response => response.json())
+        .then(data => {
+            // Handle response data here
+            console.log('Success:', data);
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+        });
+});
+
+
+function formatAIResponse(data) {
+    // Initialize an empty string to hold the HTML content
+    let htmlContent = '';
+
+    // Add the 'Questions' section if it exists
+    if (data.questions && data.questions.length > 0) {
+        htmlContent += '<h4>Suggested questions</h4><ul>';
+        data.questions.forEach(question => {
+            htmlContent += `<li>${question}</li>`;
+        });
+        htmlContent += '</ul>';
+    }
+
+    // Add the 'Points to Consider' section if it exists
+    if (data.points && data.points.length > 0) {
+        htmlContent += '<h4>Points to Consider</h4><ul>';
+        data.points.forEach(point => {
+            htmlContent += `<li>${point}</li>`;
+        });
+        htmlContent += '</ul>';
+    }
+
+    // Add the 'Summary' section if it exists
+    if (data.summary) {
+        htmlContent += '<h4>Summary of this conversation</h4>';
+        htmlContent += `<p>${data.summary}</p>`;
+    }
+
+    // Return the constructed HTML content
+    return htmlContent;
 }

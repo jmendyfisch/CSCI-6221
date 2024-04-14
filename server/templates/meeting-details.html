@@ -14,9 +14,10 @@
 </script>
 <body>
     <div class="container">
-        <h1><img src="/templates/robot_logo.png" height="40px"> Meeting Details</h1>
+        <h1><img src="/templates/robot_logo.png" height="40px">AI-Asisted Intake: Meeting Details</h1>
         <h3>Here's everything that happened during this meeting. To create a new meeting for this case, click on the button:</h3>
-        <a href="/intake/{{.case_id}}" class="button" style="display:inline-block;">New Meeting</a>        
+        <a href="/intake/{{.case_id}}" class="button" style="display:inline-block;">New Meeting</a> 
+        <a href="/delete-meeting/{{.case_id}}/{{.meeting_id}}" class="button deleteMeeting" id="deleteMeeting" style="display:inline-block">Delete Meeting</a>     
         <a href="/case-details/{{.case_id}}" class="button lawyerView" id="lawyerView" style="display:inline-block">Case Details</a>
         <a href="/log-out" class="button logoutButton" id="logoutButton" style="display:inline-block">Logout</a>
 

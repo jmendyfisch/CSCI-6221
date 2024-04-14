@@ -90,6 +90,30 @@ func (s *Service) CreateNewCase(c types.Case) (caseID int, err error) {
 	return
 }
 
+func (s *Service) CreateNewMeeting(caseID string) (meetingID int, err error) {
+	log.Println("called service.CreateNewMeeting()")
+
+	meetingID, err = database.CreateNewMeeting(caseID)
+	if err != nil {
+		log.Println("db err: ", err.Error())
+		return 0, ErrQueryFailure
+	}
+
+	return
+}
+
+func (s *Service) DeleteMeeting(meetingID string) (err error) {
+	log.Println("called service.DeleteMeeting()")
+
+	err = database.DeleteMeeting(meetingID)
+	if err != nil {
+		log.Println("db err: ", err.Error())
+		return ErrQueryFailure
+	}
+
+	return
+}
+
 func (s *Service) CreateNewLawyer(c types.Lawyer) (LawyerEmail string, err error) {
 	log.Println("called service.CreateNewLawyer()")
 
@@ -133,8 +157,9 @@ func (s *Service) AuthenticateLawyer(c types.LawyerLogin) (Success bool, LawyerI
 	return true, id, nil // Success
 }
 
-func (s *Service) ProcessInterview(caseID int, interviewAudio []byte, filepath string) (gptRes types.GPTPromptOutput, err error) {
+func (s *Service) ProcessInterview(caseID int, meetingID int, gptSummaries []string, interviewAudio []byte, filepath string) (gptRes types.GPTPromptOutput, err error) {
 	// step 1 - convert audio to text
+	log.Println("called service.ProcessInterview()")
 
 	interviewText, err := getTextFromAudio(filepath)
 	if err != nil {
@@ -144,19 +169,20 @@ func (s *Service) ProcessInterview(caseID int, interviewAudio []byte, filepath s
 	log.Println("interview text: ", interviewText)
 
 	// step 2 - send text, ask to split it into lawyer and client, get summary and addtl questions to ask client.
-	gptRes, err = getOutputTextFromTranscription(caseID, interviewText)
+	gptRes, err = getOutputTextFromTranscription(caseID, meetingID, interviewText, gptSummaries)
 	if err != nil {
 		return
 	}
 
 	// store and return result
-	err = database.AddNewMeetingDetails(caseID, gptRes)
+	log.Println("meeting id from service.ProcessInterview(): ", meetingID)
+	_, err = database.AddGPTResponse(meetingID, gptRes)
 
 	return
 	// optionally ask for the client's summary
 }
 
-func (s *Service) AddNotesToMeeting(meetingID int, notes string) (err error) {
+func (s *Service) AddNotesToMeeting(meetingID string, notes string) (err error) {
 	err = database.AddNotesToMeeting(meetingID, notes)
 	return
 }

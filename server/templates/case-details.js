@@ -1,4 +1,4 @@
-// Mock data fetching functions
+// Data fetching functions
 
 async function fetchClientInfo(caseId) {
 

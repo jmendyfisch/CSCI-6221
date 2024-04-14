@@ -107,13 +107,28 @@ func SetEndpoints(r *gin.Engine, c *controller.Controller) {
 	//intake file accepts a case_id as a parameter
 	r.GET("/intake/:case_id", func(ctx *gin.Context) {
 		caseID := ctx.Param("case_id")
+
 		if caseID == "" {
 			ctx.JSON(http.StatusBadRequest, gin.H{"error": "No case id provided"})
 			return
 		}
 
-		// Pass caseID to the template
-		ctx.HTML(http.StatusOK, "intake.html", gin.H{"case_id": caseID})
+		if c.CheckLogin(ctx, "", "", caseID, "") {
+
+			//create a meeting
+
+			meetingID, err := c.CreateNewMeeting(caseID)
+			if err != nil {
+				ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Error creating meeting"})
+				return
+			}
+
+			// Pass caseID to the template
+			ctx.HTML(http.StatusOK, "intake.html", gin.H{"case_id": caseID, "meeting_id": meetingID})
+		} else {
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Lawyer not authenticated for this case"})
+			return
+		}
 	})
 
 	r.GET("/cases", func(ctx *gin.Context) {
@@ -128,8 +143,37 @@ func SetEndpoints(r *gin.Engine, c *controller.Controller) {
 		c.AssignCaseToLawyer(ctx)
 	})
 
+	r.GET("/delete-meeting/:case_id/:meeting_id", func(ctx *gin.Context) {
+
+		caseID := ctx.Param("case_id")
+		meetingID := ctx.Param("meeting_id")
+
+		if c.CheckLogin(ctx, "", "", caseID, "") { //lawyer is authenticated for this case
+
+			//delete the meeting
+			err := c.DeleteMeeting(meetingID)
+			if err != nil {
+				ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Error deleting meeting"})
+				return
+			}
+
+			//if the meeting got deleted, redirect to the case details page
+			ctx.Redirect(http.StatusFound, "/case-details/"+caseID)
+
+		} else {
+			//this would only occur if someone hit the page directly and not from a button while viewing the meeting or
+			//while on the intake page and they weren't logged in or assigned to the case
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Lawyer not authenticated for this case"})
+			return
+		}
+	})
+
 	r.POST("/create_case", func(ctx *gin.Context) {
 		c.CreateNewCase(ctx)
+	})
+
+	r.POST("/save_lawyer_notes", func(ctx *gin.Context) {
+		c.AddNotesToMeeting(ctx)
 	})
 
 	r.POST("/lawyer_login", func(ctx *gin.Context) {

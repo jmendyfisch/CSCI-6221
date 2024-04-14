@@ -29,7 +29,7 @@ async function fetchCases(assigned) {
             lastName: obj.client_last_name,
             firstName: obj.client_first_name,
             caseType: obj.type,
-            dateInitiated: obj.created_at.split('T')[0],
+            dateInitiated: obj.created_at,
             caseId: obj.id,
             assigned: assignedInt
         }));
@@ -55,11 +55,19 @@ function createLink(caseId, text, assigned) {
 
 function generateTableRow(caseInfo) {
     const row = document.createElement('tr');
+
+    const date = new Date(caseInfo.dateInitiated);
+    const formattedDate = date.toLocaleDateString('en-US', {
+        month: '2-digit',
+        day: '2-digit',
+        year: 'numeric',
+    });
+
     row.innerHTML = `
         <td>${createLink(caseInfo.caseId, caseInfo.lastName, caseInfo.assigned)}</td>
         <td>${createLink(caseInfo.caseId, caseInfo.firstName, caseInfo.assigned)}</td>
         <td>${createLink(caseInfo.caseId, caseInfo.caseType, caseInfo.assigned)}</td>
-        <td>${createLink(caseInfo.caseId, caseInfo.dateInitiated, caseInfo.assigned)}</td>
+        <td>${createLink(caseInfo.caseId, formattedDate, caseInfo.assigned)}</td>
         <td><button class="assign-btn" data-case-id="${caseInfo.caseId}">${caseInfo.assigned ? 'Detach' : 'Assign'}</button></td>
     `;
     return row;

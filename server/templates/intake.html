@@ -1,21 +1,58 @@
 <!DOCTYPE html>
-<!--  Recording portion of file based on "how to record audio in JavaScript by Reema Alzohairi -->
-<!--  https://ralzohairi.medium.com/audio-recording-in-javascript-96eed45b75ee -->
-<!-- Modifications made for the lawyer recording applicaiton. -->
+<!-- Recording portion of file based on "how to record audio in JavaScript by Reema Alzohairi -->
+<!-- https://ralzohairi.medium.com/audio-recording-in-javascript-96eed45b75ee -->
+<!-- Modifications made for the purposes of this project. -->
+<!-- Remainder of file is original for this project, with assistance from ChatGPT -->
 <html lang="en">
 
 <head>
     <meta charset="utf-8">
-    <title>Audio Recording API Demo</title>
+    <title> AI Intake Assistant - Intake Meeting</title>
     <link rel="stylesheet" href="/templates/style_recorder.css">
-    <link rel="stylesheet" href="/templates/reset.css">
+    <!--link rel="stylesheet" href="/templates/reset.css"-->
     <link rel="stylesheet" href="/templates/font-awesome.css">
+    <link rel="stylesheet" href="/templates/style.css">
 </head>
 
 <body>
+    <div class="container">
+        <h1><img src="/templates/robot_logo.png" height="40px">AI-Assisted Intake: Intake Meeting</h1>
+        <h3>A new meeting has been created for this case. You are in the meeting now. You can allow AI to listen to your conversation and suggeset responses.</h3>   
+        <a href="/delete-meeting/{{.case_id}}/{{.meeting_id}}" class="button deleteMeeting" id="deleteMeeting" style="display:inline-block">Delete Meeting</a>
+        <a href="/case-details/{{.case_id}}" class="button lawyerView" id="lawyerView" style="display:inline-block">Case Details</a>
+        <a href="/log-out" class="button logoutButton" id="logoutButton" style="display:inline-block">Logout</a>
+
+        <div id="clientInfo">
+            <h4>Case Information</h4>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Phone Number</th>
+                        <th>Email Address</th>
+                        <th>Street Address</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Client information will be populated here in populateClientInfo() -->
+                </tbody>
+            </table>
+            
+        </div>
+        <div id="lawyerNotesSection">
+            <h4>Lawyer Notes</h4>
+            <textarea id="lawyerNotes" placeholder="Enter your notes for this meeting here..."></textarea>
+            <button id="saveNotesButton" class="button saveNotes">Save Notes</button><br><br>
+            <h4 style="padding:20; margin:0">Press the microphone to begin a conversation.</h4>
+            <h3 style="padding:0; margin:0">To stop the conversation and receive AI input, hit the green square. To cancel so that AI does not receive the recording, hit the red x.</h3>
+
+        </div>
+        
+
     <div class="audio-recording-container">
-        <h1 class="title">Audio Recording API Demo Case ID: {{.case_id}}</h1>
-        <i class="start-recording-button fa fa-microphone" aria-hidden="true"></i>
+     
+        <i class="start-recording-button fa fa-microphone bigger-microphone" aria-hidden="true"></i>
         <div class="recording-contorl-buttons-container hide">
             <i class="cancel-recording-button fa fa-times-circle-o" aria-hidden="true"></i>
             <div class="recording-elapsed-time">
@@ -25,7 +62,7 @@
             <i class="stop-recording-button fa fa-stop-circle-o" aria-hidden="true"></i>
         </div>
         <div class="text-indication-of-audio-playing-container">
-            <p class="text-indication-of-audio-playing hide">Audio is playing<span>.</span><span>.</span><span>.</span></p>
+            <p class="text-indication-of-audio-playing hide"></p>
         </div>
     </div>
     <div class="overlay hide">
@@ -38,8 +75,20 @@
     <audio controls class="audio-element hide">
     </audio>
 
+    <!-- Place this section where you want the AI response to appear -->
+    <div id="aiResponse" style="display:none">
+        <p id="loadingMessage" style="display:none">Loading AI response...</p>
+        <div id="aiResponseContent"></div>
+    </div>
+
+
     <script>
         const case_id = "{{.case_id}}";
+        const meeting_id = "{{.meeting_id}}";
+        var GLOBALS = {
+            caseId: "{{.case_id}}",
+            meeting_id: "{{.meeting_id}}"
+        };
     </script>
     <script src="/templates/audio-recording.js"></script>
     <script src="/templates/intake.js"></script>

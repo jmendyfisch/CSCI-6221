@@ -56,7 +56,7 @@ func GetAllCasesForLawyer(lawyerID int) (cases []types.Case, err error) {
 			fmt.Println("err: ", err)
 			return nil, err
 		}
-		fmt.Println(c)
+		//fmt.Println(c)
 
 		cases = append(cases, c)
 	}
@@ -77,7 +77,7 @@ func CreateNewLawyer(c types.Lawyer, hashedPassword string) (LawyerEmail string,
 	log.Println("inside database.CreateNewLawyer()")
 	var email = strings.ToLower(c.EmailAddress)
 
-	log.Println(c.LawyerFirstName)
+	//log.Println(c.LawyerFirstName)
 	row := conn.QueryRow(context.Background(), CreateLawyerQ, c.LawyerFirstName, c.LawyerLastName, email, hashedPassword)
 	err = row.Scan(&email)
 
@@ -100,15 +100,31 @@ func GetLawyerByEmail(c types.LawyerLogin) (int, string, error) {
 	return id, password, nil // Return the password and nil as the error
 }
 
-func AddNewMeetingDetails(caseID int, gptResp types.GPTPromptOutput) (err error) {
-	log.Println("inside database.AddNewMeetingDetails()")
+func CreateNewMeeting(caseID string) (meetingID int, err error) {
+	log.Println("inside database.CreateNewMeeting()")
 
-	var meetingID int
 	row := conn.QueryRow(context.Background(), CreateMeetingQ, caseID)
 	err = row.Scan(&meetingID)
+
+	return
+}
+
+func DeleteMeeting(meetingID string) (err error) {
+	log.Println("inside database.DeleteMeeting()")
+
+	var success bool
+	row1 := conn.QueryRow(context.Background(), DeleteMeetingGPTRespQ, meetingID)
+	err = row1.Scan(&success)
 	if err != nil {
-		return
+		log.Println("Deleting meeting "+meetingID+". For deleting associated GPT responses, get error", err)
 	}
+	row2 := conn.QueryRow(context.Background(), DeleteMeetingQ, meetingID)
+	err = row2.Scan(&success)
+	return
+}
+
+func AddGPTResponse(meetingID int, gptResp types.GPTPromptOutput) (gptResptID int, err error) { //Rename this function to AddGPTResponse
+	log.Println("inside database.AddGPTResponse()")
 
 	questions, points := "", ""
 	for _, iter := range gptResp.Questions {
@@ -119,17 +135,18 @@ func AddNewMeetingDetails(caseID int, gptResp types.GPTPromptOutput) (err error)
 		points += iter + "\n"
 	}
 
-	row = conn.QueryRow(context.Background(), CreateGPTRespQ, meetingID, questions, gptResp.Summary, points)
-	err = row.Scan(&meetingID)
+	log.Println("Meeting id from database.AddGPTResponse()", meetingID)
+	row := conn.QueryRow(context.Background(), CreateGPTRespQ, meetingID, questions, gptResp.Summary, points)
+	err = row.Scan(&gptResptID)
 	if err != nil {
 		log.Println("db error: ", err)
-		return ErrMeetingInsert
+		return 0, ErrMeetingInsert
 	}
 
-	return nil
+	return gptResptID, nil
 }
 
-func AddNotesToMeeting(meetingID int, notes string) error {
+func AddNotesToMeeting(meetingID string, notes string) error {
 	log.Println("inside database.AddNotesToMeeting()")
 
 	row := conn.QueryRow(context.Background(), AddNotesToMeetingQ, meetingID, notes)
@@ -269,5 +286,5 @@ func AssignCaseToLawyer(caseID, lawyerID int) (err error) {
 		}
 	}
 
-	return 
+	return
 }

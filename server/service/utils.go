@@ -30,17 +30,26 @@ func getTextFromAudio(audioFilePath string) (s string, err error) {
 	return resp.Text, nil
 }
 
-func getOutputTextFromTranscription(caseID int, text string) (res types.GPTPromptOutput, err error) {
+func getOutputTextFromTranscription(caseID int, meetingID int, text string, gptSums []string) (res types.GPTPromptOutput, err error) {
 
 	var finalText string
+
+	MeetingDetails, _ := database.GetMeetingDetails(meetingID)
 
 	desc, city, state, err := getDetails(caseID)
 	if err != nil {
 		return
 	}
 
-	finalText = "case description: " + desc + "\ncity and state: " + city + ", " + state
-	finalText = finalText + "\n interview transcription: " + text
+	finalText = "Case description provided by client: " + desc + "\nClient city and state: " + city + ", " + state + "\n Lawyer notes from meeting: " + MeetingDetails.LawyerNotes.String + "\n Summaries of previous conversations between the lawyer and client: "
+
+	for _, sum := range gptSums {
+		finalText += "\n" + sum
+	}
+
+	finalText = finalText + "\n*** The interview transcription for the present conversation starts here: " + text
+
+	fmt.Println("INPUT TEXT FOR CASE SUMMARY: ", finalText)
 
 	client := openai.NewClient(config.OpenAIKey)
 
@@ -77,7 +86,7 @@ func getOutputTextFromTranscription(caseID int, text string) (res types.GPTPromp
 }
 
 func getCaseSummary(desc string, gptSums []string) (string, error) {
-	text := "description - " + desc + "\n meeting summaries - "
+	text := "Client's description of case - " + desc + "\n meeting summaries - "
 
 	for _, sum := range gptSums {
 		text += "\n" + sum
