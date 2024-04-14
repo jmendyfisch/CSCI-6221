@@ -1,5 +1,7 @@
 // Contains the OpenAI configurations
 // and the Prompts for Transcription Analysis and Case summarization.
+// Prompts original for project, file is based on OpenAI's chat completion API.
+// Utilizes Alexander Baranov's go-openai package.
 
 package config
 

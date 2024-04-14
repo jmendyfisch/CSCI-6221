@@ -1,5 +1,7 @@
 // The Controller handles all HTTP Requests using *gin.Context objects.
 // It is not cognizant of the internals of the business logic.
+// Original for project, based on controller-service-repository architecture (ChatGPT assisted with development)
+// Utilizes Gin web framework.
 
 package controller
 

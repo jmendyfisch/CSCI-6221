@@ -1,3 +1,7 @@
+// Javascript for the index page
+// Form validation and form submission logic
+// Original for this project with ChatGPT assistance
+
 const validStateCodes = [
     'AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'FL', 'GA', 
     'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MD', 

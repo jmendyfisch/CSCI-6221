@@ -1,4 +1,6 @@
-// Data fetching functions
+// Javascript for the case-details page
+// Makes database queries and populates tables asynchonously
+// Original for this project with ChatGPT assistance
 
 async function fetchClientInfo(caseId) {
 

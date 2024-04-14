@@ -1,4 +1,5 @@
 // All the queries for the database.
+// Developed for this project
 
 package database
 

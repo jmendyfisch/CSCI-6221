@@ -1,9 +1,9 @@
-/* Audio recording portion based on "How to record audio in JavaScript" by Reema Alzohairi 
+/* Javascript for the intake page. Audio recording portion based on "How to record audio in JavaScript" by Reema Alzohairi 
 https://ralzohairi.medium.com/audio-recording-in-javascript-96eed45b75ee 
-With modifications to submit the audio file to the server via a POST request 
-instead of playing it back in the browser.
-Remainder of file is original for this project.
+With modifications to submit the audio file to the server via a POST request instead of playing it back in the browser.
+The saveAudio function is original code for this project, as well as everything below line 382 (developed with ChatGPT assistance).
 */
+
 //View
 var microphoneButton = document.getElementsByClassName("start-recording-button")[0];
 var recordingControlButtonsContainer = document.getElementsByClassName("recording-contorl-buttons-container")[0];

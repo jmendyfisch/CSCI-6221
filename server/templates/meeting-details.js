@@ -1,3 +1,7 @@
+// Javascript for the meeting-details page
+// Data fetching and population of meeting details and GPT responses asynchronously
+// Original for this project with ChatGPT assistance
+
 // Asynch data fetching functions
 async function fetchMeetingInfo(caseId) {
 

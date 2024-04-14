@@ -1,3 +1,7 @@
+// Javascript for the lawyer login page
+// Form validation and form submission logic for the login functionality
+// Original for this project with ChatGPT assistance
+
 document.getElementById("submit").addEventListener("click", function(event) {
     let isValid = true;
 

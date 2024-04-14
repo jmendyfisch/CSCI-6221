@@ -1,4 +1,6 @@
 // Main file, application server runs here.
+// Directs all traffic to the appropriate controller functions.
+// Original for project, based on controller-service-repository architecture (ChatGPT assisted with development)
 
 package main
 

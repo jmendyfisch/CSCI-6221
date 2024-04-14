@@ -1,3 +1,7 @@
+// Javascript for the new-account page
+// Form validation and form submission logic for creating a new lawyer account
+// Original for this project with ChatGPT assistance
+
 document.getElementById("submit").addEventListener("click", function(event) {
     let isValid = true;
 

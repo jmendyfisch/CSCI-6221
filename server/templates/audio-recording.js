@@ -1,8 +1,9 @@
 
 // audio-recording.js ---------------
-//API to handle audio recording 
-// based on "how to record audio in JavaScript by Reema Alzohairi 
+// API to handle audio recording 
+// Based on "How to record audio in JavaScript" by Reema Alzohairi 
 // https://ralzohairi.medium.com/audio-recording-in-javascript-96eed45b75ee 
+// This is NOT original code for this project.
 
 var audioRecorder = {
     /** Stores the recorded audio as Blob objects of audio data as the recording continues*/

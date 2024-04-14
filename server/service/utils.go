@@ -1,4 +1,5 @@
 // All utility/helper functions for the Service package.
+// Original for project, based on controller-service-repository architecture (ChatGPT assisted with development)
 
 package service
 

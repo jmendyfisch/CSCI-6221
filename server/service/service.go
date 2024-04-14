@@ -3,6 +3,9 @@ The Service package is responsible for implementing the actual business logic ba
 the requirements from the Controller. A Controller object is always assoicated with a Service object.
 
 It is also responsible to request and format the database query outputs and propagate any errors that arise.
+
+Original for project, based on controller-service-repository architecture (ChatGPT assisted with development)
+
 */
 
 package service

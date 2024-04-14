@@ -1,4 +1,7 @@
-// Asnyc data fetching function
+// Javascript for the display-cases page
+// Makes database queries and populates tables asynchonously
+// Original for this project with ChatGPT assistance
+
 async function fetchCases(assigned) {
     const lId = GLOBALS.lawyerId;
     let assignedInt = 0;

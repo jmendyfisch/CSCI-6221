@@ -1,6 +1,8 @@
 /*
 The Database package is responsible for connecting to the Postgres server
 and handling all database queries for the Service package.
+Original for project, based on controller-service-repository architecture (ChatGPT assisted with development)
+Utilizes PGX library for Postgres database connection.
 */
 
 package database

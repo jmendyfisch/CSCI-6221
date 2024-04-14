@@ -1,4 +1,5 @@
 // User Defined datatypes for ease of data propagation and encappsulation
+// Original for project, based on controller-service-repository architecture (ChatGPT assisted with development)
 
 package types
 
