@@ -55,6 +55,9 @@ func getOutputTextFromTranscription(caseID int, meetingID int, text string, gptS
 
 	req := openai.ChatCompletionRequest{
 		Model: config.GPTModel,
+		ResponseFormat: &openai.ChatCompletionResponseFormat{
+			Type: openai.ChatCompletionResponseFormatTypeJSONObject,
+		},
 		Messages: []openai.ChatCompletionMessage{
 			{
 				Role:    openai.ChatMessageRoleSystem,
