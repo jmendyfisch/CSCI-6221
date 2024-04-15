@@ -1,4 +1,4 @@
---
+-- Database structure for this project including a few sample records 
 -- PostgreSQL database dump
 --
 
